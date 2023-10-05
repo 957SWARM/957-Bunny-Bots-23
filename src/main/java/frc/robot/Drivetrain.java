@@ -1,33 +1,42 @@
 package frc.robot;
 
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.wpilibj.AnalogGyro;
 
 public class Drivetrain {
-    public static final double kMaxSpeed = 0.0;
+    public static final double kMaxSpeed = 3.0;
     public static final double kMaxAngularSpeed = Math.PI;
 
-  private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
-  private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
-  private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
-  private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
+    private final Translation2d m_frontLeftLocation = new Translation2d(0.381, 0.381);
+    private final Translation2d m_frontRightLocation = new Translation2d(0.381, -0.381);
+    private final Translation2d m_backLeftLocation = new Translation2d(-0.381, 0.381);
+    private final Translation2d m_backRightLocation = new Translation2d(-0.381, -0.381);
 
-  private final SwerveModule m_frontLeft = new SwerveModule(1, 2, 0, 1, 2, 3);
-  private final SwerveModule m_frontRight = new SwerveModule(3, 4, 4, 5, 6, 7);
-  private final SwerveModule m_backLeft = new SwerveModule(5, 6, 8, 9, 10, 11);
-  private final SwerveModule m_backRight = new SwerveModule(7, 8, 12, 13, 14, 15);
+    private final MAXSwerveModule m_frontLeft;
+    private final MAXSwerveModule m_frontRight;
+    private final MAXSwerveModule m_backLeft;
+    private final MAXSwerveModule m_backRight;
 
-  private final AnalogGyro m_gyro = new AnalogGyro(0);
+  private final AHRS m_gyro = new AHRS();
 
   private final SwerveDriveKinematics m_kinematics =
       new SwerveDriveKinematics(
           m_frontLeftLocation, m_frontRightLocation, m_backLeftLocation, m_backRightLocation);
 
-  private final SwerveDriveOdometry m_odometry =
+  private final SwerveDriveOdometry m_odometry;
+
+  public Drivetrain(double fl_offset, double fr_offset, double bl_offset, double br_offset) {
+
+    m_frontLeft = new MAXSwerveModule(3, 4, (fl_offset-.25)*6.28);
+    m_frontRight = new MAXSwerveModule(1, 2, (fr_offset)*6.28);
+    m_backLeft = new MAXSwerveModule(5, 6, (bl_offset+.5)*6.28);
+    m_backRight = new MAXSwerveModule(7, 8, (br_offset+.25)*6.28);
+
+    m_odometry =
       new SwerveDriveOdometry(
           m_kinematics,
           m_gyro.getRotation2d(),
@@ -38,7 +47,6 @@ public class Drivetrain {
             m_backRight.getPosition()
           });
 
-  public Drivetrain() {
     m_gyro.reset();
   }
 
@@ -61,7 +69,7 @@ public class Drivetrain {
     m_frontRight.setDesiredState(swerveModuleStates[1]);
     m_backLeft.setDesiredState(swerveModuleStates[2]);
     m_backRight.setDesiredState(swerveModuleStates[3]);
-  }
+  }    
 
   /** Updates the field relative position of the robot. */
   public void updateOdometry() {
