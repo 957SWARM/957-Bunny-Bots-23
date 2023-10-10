@@ -1,7 +1,11 @@
 package frc.robot.subsystems.shooter;
 
-public class ShooterHardware implements Shooter {
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+public class ShooterHardware implements Shooter {
+    CANSparkMax m_shooterMotor = new CANSparkMax(0, MotorType.kBrushless);
+    
     @Override
     public void setFlywheelVoltage() {
         // TODO Auto-generated method stub
@@ -9,9 +13,9 @@ public class ShooterHardware implements Shooter {
     }
 
     @Override
-    public void setHoodVoltage() {
+    public void periodic() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setHoodVoltage'");
+        throw new UnsupportedOperationException("Unimplemented method 'periodic'");
     }
     
 }
