@@ -17,11 +17,15 @@ public class Robot extends TimedRobot {
    * This function is run when the robot is first started up and should be used for any
    * initialization code.
    */
+  Limelight limelight = new Limelight();
+
   @Override
   public void robotInit() {}
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    System.out.println("TARGET DISTANCE: " + limelight.getTargetDistance() + "|| TARGET HEIGHT: " + limelight.getTargetHeight());
+  }
 
   @Override
   public void autonomousInit() {}
