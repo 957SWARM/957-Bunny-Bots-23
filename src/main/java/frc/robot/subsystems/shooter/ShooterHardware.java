@@ -5,7 +5,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 public class ShooterHardware implements Shooter {
     CANSparkMax m_shooterMotor = new CANSparkMax(0, MotorType.kBrushless);
-    
+
     @Override
     public void setFlywheelVoltage() {
         // TODO Auto-generated method stub
@@ -17,5 +17,4 @@ public class ShooterHardware implements Shooter {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'periodic'");
     }
-    
 }
