@@ -3,6 +3,8 @@ package frc.robot.subsystems.shooter;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+// Everything in this class is just waiting on hardware decisions to be made
+
 public class ShooterHardware implements Shooter {
     CANSparkMax m_shooterMotor = new CANSparkMax(0, MotorType.kBrushless);
 
@@ -27,6 +29,14 @@ public class ShooterHardware implements Shooter {
     @Override
     public double getFlywheelVelocityRadsPerS() {
         // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getFlywheelVelocityRadsPerS'");
+        throw new UnsupportedOperationException(
+                "Unimplemented method 'getFlywheelVelocityRadsPerS'");
+    }
+
+    @Override
+    public double getFlywheelAccelerationRadsPerSSquard() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException(
+                "Unimplemented method 'getFlywheelAccelerationRadsPerSSquard'");
     }
 }

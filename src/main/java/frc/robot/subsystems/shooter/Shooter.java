@@ -7,5 +7,7 @@ public interface Shooter {
 
     public double getFlywheelVelocityRadsPerS();
 
+    public double getFlywheelAccelerationRadsPerSSquard();
+
     public void periodic();
 }
