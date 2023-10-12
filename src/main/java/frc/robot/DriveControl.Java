@@ -1,9 +1,9 @@
-
+package frc.robot;
 import edu.wpi.first.wpilibj.Joystick;
 
-public class DriveController extends Joystick {
+public class DriveControl extends Joystick {
 
-    public DriveController(int port) {
+    public DriveControl(int port) {
         super(port);
         //TODO Auto-generated constructor stub
     }
@@ -33,20 +33,20 @@ public class DriveController extends Joystick {
         return super.getRawButton(another);
     }
 
-    public boolean getXAxisDrive(){
-        return super.getRawAxis(xAxisDrive);
+    public double getXAxisDrive(){
+        return -super.getRawAxis(xAxisDrive);
     }
 
-    public boolean getYAxisDrive(){
+    public double getYAxisDrive(){
         return -super.getRawAxis(yAxisDrive);
     }
 
-    public boolean getGTurnAxis(){
-        return super.getRawAxis(gTurnAxis);
+    public double getGTurnAxis(){
+        return -super.getRawAxis(gTurnAxis);
 
     }
     
-    public boolean getRightStickY(){
+    public double getRightStickY(){
         return super.getRawAxis(rightStickY);
     }
 }
