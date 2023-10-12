@@ -11,13 +11,22 @@ public class ShooterSim implements Shooter {
                     Constants.ShooterConstants.FLYWHEEL_MOMENT_KG_M2);
 
     @Override
-    public void setFlywheelVoltage() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'setFlywheelVoltage'");
+    public void setFlywheelVoltage(double volts) {
+        physics.setInputVoltage(volts);
     }
 
     @Override
     public void periodic() {
         physics.update(Constants.Misc.LOOP_PERIOD_S);
+    }
+
+    @Override
+    public double getFlywheelCurrent() {
+        return physics.getCurrentDrawAmps();
+    }
+
+    @Override
+    public double getFlywheelVelocityRadsPerS() {
+        return physics.getAngularVelocityRadPerSec();
     }
 }
