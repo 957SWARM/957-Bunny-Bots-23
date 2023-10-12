@@ -10,7 +10,6 @@ import java.util.function.DoubleSupplier;
 
 public class ShooterController {
     private final Shooter shooter;
-    private final DoubleSupplier setpointRadiansPerSecond;
 
     private final boolean useFeedback;
     private final boolean useFeedforward;
@@ -33,7 +32,6 @@ public class ShooterController {
             boolean useFeedforward,
             boolean useProfiling) {
         this.shooter = shooter;
-        this.setpointRadiansPerSecond = setpointRadiansPerSecond;
 
         this.useFeedback = useFeedback;
         this.useFeedforward = useFeedforward;
@@ -47,10 +45,10 @@ public class ShooterController {
     }
 
     // should be called once per loop cycle
-    public void execute() {
+    public void execute(double setpointRadiansPerSecond) {
         double dt = dtUtil.getTimeSecondsSinceLastCall();
 
-        double setpoint;
+        double profiledSetpoint;
 
         double setpointVelocity;
 
@@ -61,14 +59,14 @@ public class ShooterController {
                             new TrapezoidProfile.State(
                                     shooter.getFlywheelVelocityRadsPerS(),
                                     shooter.getFlywheelAccelerationRadsPerSSquard()),
-                            new TrapezoidProfile.State(setpointRadiansPerSecond.getAsDouble(), 0));
+                            new TrapezoidProfile.State(setpointRadiansPerSecond, 0));
 
             TrapezoidProfile.State state = profile.calculate(dt);
 
-            setpoint = state.position; // actually velocity
+            profiledSetpoint = state.position; // actually velocity
             setpointVelocity = state.velocity; // actually acceleration
         } else {
-            setpoint = setpointRadiansPerSecond.getAsDouble();
+            profiledSetpoint = setpointRadiansPerSecond;
 
             setpointVelocity = 0;
         }
@@ -76,12 +74,12 @@ public class ShooterController {
         double controlEffort = 0;
 
         if (useFeedback) {
-            feedback.setSetpoint(setpoint);
+            feedback.setSetpoint(profiledSetpoint);
             controlEffort += feedback.calculate(shooter.getFlywheelVelocityRadsPerS(), dt);
         }
 
         if (useFeedforward) {
-            controlEffort += feedforward.calculate(setpoint, setpointVelocity);
+            controlEffort += feedforward.calculate(profiledSetpoint, setpointVelocity);
         }
 
         shooter.setFlywheelVoltage(controlEffort);

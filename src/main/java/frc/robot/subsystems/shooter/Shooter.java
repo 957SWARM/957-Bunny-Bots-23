@@ -9,5 +9,6 @@ public interface Shooter {
 
     public double getFlywheelAccelerationRadsPerSSquard();
 
+    // this needs to be called every loop in order for this to function
     public void periodic();
 }
