@@ -17,5 +17,36 @@ public class DriveController extends Joystick {
 	final int gTurnAxis = 4; // 4 axis 
     final int rightStickY = 5; // 5 axis
 
+    public boolean getShoot(){
+        return super.getRawButton(shoot);
+    }
+        
+    public boolean getExtra(){
+        return super.getRawButton(extra);
+    }
+    
+    public boolean getIntake(){
+        return super.getRawButton(intake);
+    }
+    
+    public boolean getAnother(){
+        return super.getRawButton(another);
+    }
 
+    public boolean getXAxisDrive(){
+        return super.getRawAxis(xAxisDrive);
+    }
+
+    public boolean getYAxisDrive(){
+        return -super.getRawAxis(yAxisDrive);
+    }
+
+    public boolean getGTurnAxis(){
+        return super.getRawAxis(gTurnAxis);
+
+    }
+    
+    public boolean getRightStickY(){
+        return super.getRawAxis(rightStickY);
+    }
 }
