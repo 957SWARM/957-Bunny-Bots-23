@@ -7,7 +7,6 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,86 +15,86 @@ import edu.wpi.first.wpilibj.XboxController;
  * project.
  */
 public class Robot extends TimedRobot {
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
+    /**
+     * This function is run when the robot is first started up and should be used for any
+     * initialization code.
+     */
     // Offsets of the swerve modules must be set to 0 before code works
 
-  private DriveControl m_controller = new DriveControl(0);
-  private final Drivetrain m_swerve = new Drivetrain(0, 0, 0, 0);
+    private DriveControl m_controller = new DriveControl(0);
 
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
-    
-  @Override
-  public void robotInit() {}
+    private final Drivetrain m_swerve = new Drivetrain(0, 0, 0, 0);
 
-  @Override
-  public void robotPeriodic() {}
+    private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
+    private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
 
-  @Override
-  public void autonomousInit() {}
+    @Override
+    public void robotInit() {}
 
-  @Override
-  public void autonomousPeriodic() {
-    driveWithJoystick(false);
-    m_swerve.updateOdometry();
-  }
+    @Override
+    public void robotPeriodic() {}
 
-  @Override
-  public void teleopInit() {}
+    @Override
+    public void autonomousInit() {}
 
-  @Override
-  public void teleopPeriodic() {
-    driveWithJoystick(true);
-    m_swerve.updateOdometry();
-  }
+    @Override
+    public void autonomousPeriodic() {
+        driveWithJoystick(false);
+        m_swerve.updateOdometry();
+    }
 
-  @Override
-  public void disabledInit() {}
+    @Override
+    public void teleopInit() {}
 
-  @Override
-  public void disabledPeriodic() {}
+    @Override
+    public void teleopPeriodic() {
+        driveWithJoystick(true);
+        m_swerve.updateOdometry();
+    }
 
-  @Override
-  public void testInit() {}
+    @Override
+    public void disabledInit() {}
 
-  @Override
-  public void testPeriodic() {}
+    @Override
+    public void disabledPeriodic() {}
 
-  @Override
-  public void simulationInit() {}
+    @Override
+    public void testInit() {}
 
-  @Override
-  public void simulationPeriodic() {}
+    @Override
+    public void testPeriodic() {}
 
+    @Override
+    public void simulationInit() {}
 
-  // Robot.java Methods
+    @Override
+    public void simulationPeriodic() {}
 
-  private void driveWithJoystick(boolean fieldRelative) {
-    // Get the x speed. We are inverting this because Xbox controllers return
-    // negative values when we push forward.
-    final var xSpeed =
-        m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getYAxisDrive(), 0.1))
-            * Drivetrain.kMaxSpeed;
+    // Robot.java Methods
 
-    // Get the y speed or sideways/strafe speed. We are inverting this because
-    // we want a positive value when we pull to the left. Xbox controllers
-    // return positive values when you pull to the right by default.
-    final var ySpeed =
-        m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getXAxisDrive(), 0.1))
-            * Drivetrain.kMaxSpeed;
+    private void driveWithJoystick(boolean fieldRelative) {
+        // Get the x speed. We are inverting this because Xbox controllers return
+        // negative values when we push forward.
+        final var xSpeed =
+                m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getYAxisDrive(), 0.1))
+                        * Drivetrain.kMaxSpeed;
 
-    // Get the rate of angular rotation. We are inverting this because we want a
-    // positive value when we pull to the left (remember, CCW is positive in
-    // mathematics). Xbox controllers return positive values when you pull to
-    // the right by default.
-    final var rot =
-        m_rotLimiter.calculate(MathUtil.applyDeadband(m_controller.getGTurnAxis(), 0.1))
-            * Drivetrain.kMaxAngularSpeed;
+        // Get the y speed or sideways/strafe speed. We are inverting this because
+        // we want a positive value when we pull to the left. Xbox controllers
+        // return positive values when you pull to the right by default.
+        final var ySpeed =
+                m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getXAxisDrive(), 0.1))
+                        * Drivetrain.kMaxSpeed;
 
-    m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
-  }
+        // Get the rate of angular rotation. We are inverting this because we want a
+        // positive value when we pull to the left (remember, CCW is positive in
+        // mathematics). Xbox controllers return positive values when you pull to
+        // the right by default.
+        final var rot =
+                m_rotLimiter.calculate(MathUtil.applyDeadband(m_controller.getGTurnAxis(), 0.1))
+                        * Drivetrain.kMaxAngularSpeed;
+
+        m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
+    }
 }
