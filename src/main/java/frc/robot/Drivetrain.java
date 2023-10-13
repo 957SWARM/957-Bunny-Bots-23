@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -51,6 +52,21 @@ public class Drivetrain {
                         });
 
         m_gyro.reset();
+    }
+
+    /**
+     * Returns the pose estimated by wheel odometry and gyroscope measurements.
+     *
+     * <p>Note that this is subject to a significant amount of drift during matches and should not
+     * be trusted (without vision corrections) except for before the bumpers have touched anything.
+     *
+     * <p>The initial pose of the odometry may also not be consistent with the conventional field
+     * coordinate system (as of 10/13).
+     *
+     * @return A Pose2d (x and y in meters).
+     */
+    public Pose2d getOdometryPose() {
+        return m_odometry.getPoseMeters();
     }
 
     /**
