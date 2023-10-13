@@ -1,16 +1,13 @@
 package frc.robot;
 
-import org.opencv.core.Mat;
-
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 public class Limelight {
 
     //Variables
-    private final double targetWidth = 0.267; //Meters
+    private final double targetHeight = 1.44; //Meters
     private final double limelightAngle = 26; //Degrees
     private final double limelightHeight = 0.229; //Meters
 
@@ -99,24 +96,11 @@ public class Limelight {
         return tclass;
     }
 
-    public double getTargetAngleDegrees(){
-        double targetAngle = limelightAngle + getTx();
-        return targetAngle;
-    }
-
-    public double getAngleDistance(){
-        double angleDistance = (targetWidth/2) / Math.tan(Math.toRadians(getTx()));
-        return angleDistance;
-    }
-
-    public double getTargetDistance(){
-        double targetDistance = getAngleDistance() * Math.cos(Math.toRadians(getTargetAngleDegrees()));
-        return targetDistance;
-    }
-
-    public double getTargetHeight(){
-        double targetHeight = getAngleDistance() * Math.sin(Math.toRadians(getTargetAngleDegrees())) + limelightHeight;
-        return targetHeight;
+    public double getDistanceFromTarget(){
+        double angleToGoalDegrees = limelightAngle + getTy();
+        double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+        double distanceFromLimelightToGoalMeters = (targetHeight - limelightHeight) / Math.tan(angleToGoalRadians);
+        return distanceFromLimelightToGoalMeters;
     }
     
 }
