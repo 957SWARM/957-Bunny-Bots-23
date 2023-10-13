@@ -1,4 +1,4 @@
-//It's Blinkin' Time!
+// It's Blinkin' Time!
 
 package frc.robot;
 
@@ -8,49 +8,42 @@ public class Blinkin {
 
     Spark motor;
 
-    public Blinkin(int Channel){
+    public Blinkin(int Channel) {
 
         motor = new Spark(Channel);
-
     }
 
-    //No balls
-    public void green(){
+    // No balls
+    public void green() {
 
-            motor.set(0.73);
-
+        motor.set(0.73);
     }
 
-    //Full balls
-    public void red(){
+    // Full balls
+    public void red() {
 
-            motor.set(0.61);
-
+        motor.set(0.61);
     }
 
-    //1-2 Balls
-    public void gold(){
+    // 1-2 Balls
+    public void gold() {
 
-            motor.set(0.67);
-
+        motor.set(0.67);
     }
 
-    //3-4 Balls
-    public void redOrange(){
+    // 3-4 Balls
+    public void redOrange() {
 
-            motor.set(0.63);
-
+        motor.set(0.63);
     }
 
-    public void automation(){
-            
-            motor.set(-0.57);
+    public void automation() {
 
+        motor.set(-0.57);
     }
 
-    public void secondAutomation(){
+    public void secondAutomation() {
 
-            motor.set(-0.89);
-
+        motor.set(-0.89);
     }
 }
