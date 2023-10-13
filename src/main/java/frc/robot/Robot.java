@@ -23,9 +23,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {}
 
   @Override
-  public void robotPeriodic() {
-    System.out.println("TARGET DISTANCE: " + limelight.getTargetDistance() + "|| TARGET HEIGHT: " + limelight.getTargetHeight());
-  }
+  public void robotPeriodic() {}
 
   @Override
   public void autonomousInit() {}
