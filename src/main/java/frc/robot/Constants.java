@@ -147,4 +147,22 @@ public class Constants {
 
         public static final int FEEDBACK_INTEGRATION_WINDOW = 25;
     }
+
+    public static final class IntakeConstants {
+        public static final double CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
+        public static final double HIGH_CURRENT_THRESHOLD_AMPS = 10;
+
+        public static final double RUNNING_VOLTAGE = 10;
+    }
+
+    public static final class TransferConstants {
+        public static final double LIFT_CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
+        public static final double LIFT_HIGH_CURRENT_THRESHOLD_AMPS = 10;
+
+        public static final double CONTROL_WHEEL_CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
+        public static final double CONTROL_WHEEL_HIGH_CURRENT_THRESHOLD_AMPS = 10;
+
+        public static final double LIFT_RUNNING_VOLTAGE = 10;
+        public static final double CONTROL_WHEEL_RUNNING_VOLTAGE = 10;
+    }
 }
