@@ -26,11 +26,9 @@ public class TransferController {
     public void execute(boolean runLift, boolean runControlWheel) {
         double dt = dtUtil.getTimeSecondsSinceLastCall();
 
-        transfer.setLiftVoltage(runLift ? Constants.TransferConstants.LIFT_RUNNING_VOLTAGE : 0);
         transfer.setControlWheelVoltage(
                 runControlWheel ? Constants.TransferConstants.CONTROL_WHEEL_RUNNING_VOLTAGE : 0);
 
-        liftCurrentFilter.calculate(transfer.getLiftCurrentAmps(), dt);
         controlWheelCurrentFilter.calculate(transfer.getControlWheelCurrentAmps(), dt);
     }
 
