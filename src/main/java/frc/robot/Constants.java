@@ -1,8 +1,10 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.team957.lib.controllers.feedback.PID;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -129,5 +131,38 @@ public class Constants {
 
     public static final class NeoMotorConstants {
         public static final double kFreeSpeedRpm = 5676;
+    }
+
+    public static final class ShooterConstants {
+        public static final double FLYWHEEL_MOMENT_KG_M2 = 1;
+
+        public static final DCMotor FLYWHEEL_DRIVE = DCMotor.getNEO(1).withReduction(2);
+
+        // since this is for a velocity controller, the dimensions of these are *actually*
+        // acceleration and jerk
+        public static final TrapezoidProfile.Constraints MOTION_PROFILE_CONSTRAINTS =
+                new TrapezoidProfile.Constraints(1, 1);
+
+        public static final PID.PIDConstants FEEDBACK_CONSTANTS = new PID.PIDConstants(0, 0, 0);
+
+        public static final int FEEDBACK_INTEGRATION_WINDOW = 25;
+    }
+
+    public static final class IntakeConstants {
+        public static final double CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
+        public static final double HIGH_CURRENT_THRESHOLD_AMPS = 10;
+
+        public static final double RUNNING_VOLTAGE = 10;
+    }
+
+    public static final class TransferConstants {
+        public static final double LIFT_CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
+        public static final double LIFT_HIGH_CURRENT_THRESHOLD_AMPS = 10;
+
+        public static final double CONTROL_WHEEL_CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
+        public static final double CONTROL_WHEEL_HIGH_CURRENT_THRESHOLD_AMPS = 10;
+
+        public static final double LIFT_RUNNING_VOLTAGE = 10;
+        public static final double CONTROL_WHEEL_RUNNING_VOLTAGE = 10;
     }
 }
