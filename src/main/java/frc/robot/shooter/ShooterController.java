@@ -1,15 +1,17 @@
-package frc.robot.actions.shooter;
+package frc.robot.shooter;
 
 import com.team957.lib.controllers.feedback.PID;
 import com.team957.lib.util.DeltaTimeUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.shooter.Shooter;
 import java.util.function.DoubleSupplier;
 
-public class ShooterController {
+public class ShooterController extends CommandBase {
     private final Shooter shooter;
+
+    private final DoubleSupplier setpointRadiansPerSecond;
 
     private final boolean useFeedback;
     private final boolean useFeedforward;
@@ -31,6 +33,10 @@ public class ShooterController {
             boolean useFeedback,
             boolean useFeedforward,
             boolean useProfiling) {
+        addRequirements(shooter);
+
+        this.setpointRadiansPerSecond = setpointRadiansPerSecond;
+
         this.shooter = shooter;
 
         this.useFeedback = useFeedback;
@@ -44,8 +50,8 @@ public class ShooterController {
         this(shooter, setpointRadiansPerSecond, true, true, true);
     }
 
-    // should be called once per loop cycle
-    public void execute(double setpointRadiansPerSecond) {
+    @Override
+    public void execute() {
         double dt = dtUtil.getTimeSecondsSinceLastCall();
 
         double profiledSetpoint;
@@ -59,14 +65,14 @@ public class ShooterController {
                             new TrapezoidProfile.State(
                                     shooter.getFlywheelVelocityRadsPerS(),
                                     shooter.getFlywheelAccelerationRadsPerSSquard()),
-                            new TrapezoidProfile.State(setpointRadiansPerSecond, 0));
+                            new TrapezoidProfile.State(setpointRadiansPerSecond.getAsDouble(), 0));
 
             TrapezoidProfile.State state = profile.calculate(dt);
 
             profiledSetpoint = state.position; // actually velocity
             setpointVelocity = state.velocity; // actually acceleration
         } else {
-            profiledSetpoint = setpointRadiansPerSecond;
+            profiledSetpoint = setpointRadiansPerSecond.getAsDouble();
 
             setpointVelocity = 0;
         }

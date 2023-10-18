@@ -1,4 +1,4 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.shooter;
 
 import com.team957.lib.math.filters.DifferentiatingFilter;
 import com.team957.lib.util.DeltaTimeUtil;

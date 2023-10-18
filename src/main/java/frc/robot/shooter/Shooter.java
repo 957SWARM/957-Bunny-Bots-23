@@ -1,6 +1,8 @@
-package frc.robot.subsystems.shooter;
+package frc.robot.shooter;
 
-public interface Shooter {
+import edu.wpi.first.wpilibj2.command.Subsystem;
+
+public interface Shooter extends Subsystem {
     public void setFlywheelVoltage(double volts);
 
     public double getFlywheelCurrent();
@@ -8,7 +10,4 @@ public interface Shooter {
     public double getFlywheelVelocityRadsPerS();
 
     public double getFlywheelAccelerationRadsPerSSquard();
-
-    // this needs to be called every loop in order for this to function
-    public void periodic();
 }
