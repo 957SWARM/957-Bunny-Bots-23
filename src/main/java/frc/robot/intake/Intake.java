@@ -1,6 +1,8 @@
-package frc.robot.subsystems.intake;
+package frc.robot.intake;
 
-public interface Intake {
+import edu.wpi.first.wpilibj2.command.Subsystem;
+
+public interface Intake extends Subsystem {
     // methods TBD as we figure out breakbeams etc
 
     public void setVoltage(double voltage);

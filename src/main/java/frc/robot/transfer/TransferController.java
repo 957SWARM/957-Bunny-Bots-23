@@ -1,40 +1,42 @@
-package frc.robot.actions.transfer;
+package frc.robot.transfer;
 
 import com.team957.lib.math.filters.ExponentialMovingAverage;
 import com.team957.lib.util.DeltaTimeUtil;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
-import frc.robot.subsystems.transfer.Transfer;
+import java.util.function.BooleanSupplier;
 
-public class TransferController {
+public class TransferController extends CommandBase {
     private final Transfer transfer;
+
+    private final BooleanSupplier runControlWheel;
 
     private final DeltaTimeUtil dtUtil;
 
-    private final ExponentialMovingAverage liftCurrentFilter =
-            new ExponentialMovingAverage(
-                    Constants.TransferConstants.LIFT_CURRENT_FILTER_RESPONSE_CONSTANT);
     private final ExponentialMovingAverage controlWheelCurrentFilter =
             new ExponentialMovingAverage(
                     Constants.TransferConstants.CONTROL_WHEEL_CURRENT_FILTER_RESPONSE_CONSTANT);
 
-    public TransferController(Transfer transfer) {
+    public TransferController(Transfer transfer, BooleanSupplier runControlWheel) {
+        addRequirements(transfer);
+        
         this.transfer = transfer;
+
+        this.runControlWheel = runControlWheel;
 
         dtUtil = new DeltaTimeUtil();
     }
 
-    public void execute(boolean runLift, boolean runControlWheel) {
+    @Override
+    public void execute() {
         double dt = dtUtil.getTimeSecondsSinceLastCall();
 
         transfer.setControlWheelVoltage(
-                runControlWheel ? Constants.TransferConstants.CONTROL_WHEEL_RUNNING_VOLTAGE : 0);
+                runControlWheel.getAsBoolean()
+                        ? Constants.TransferConstants.CONTROL_WHEEL_RUNNING_VOLTAGE
+                        : 0);
 
         controlWheelCurrentFilter.calculate(transfer.getControlWheelCurrentAmps(), dt);
-    }
-
-    public boolean liftCurrentIsHigh() {
-        return (liftCurrentFilter.getCurrentOutput()
-                >= Constants.TransferConstants.LIFT_HIGH_CURRENT_THRESHOLD_AMPS);
     }
 
     public boolean controlWheelCurrentIsHigh() {
