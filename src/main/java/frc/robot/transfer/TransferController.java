@@ -19,7 +19,7 @@ public class TransferController extends CommandBase {
 
     public TransferController(Transfer transfer, BooleanSupplier runControlWheel) {
         addRequirements(transfer);
-        
+
         this.transfer = transfer;
 
         this.runControlWheel = runControlWheel;

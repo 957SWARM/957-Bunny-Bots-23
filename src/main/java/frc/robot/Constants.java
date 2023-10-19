@@ -161,4 +161,11 @@ public class Constants {
 
         public static final double CONTROL_WHEEL_RUNNING_VOLTAGE = 10;
     }
+
+    // These constants are currently a guess
+    public static final class BunnyExtenderConstants {
+        public static final int MODULE_PORT = 1;
+        public static final int FORWARD_PORT = 1;
+        public static final int REVERSE_PORT = 2;
+    }
 }
