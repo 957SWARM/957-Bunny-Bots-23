@@ -16,13 +16,11 @@ public class BunnyExtenderHardware implements BunnyExtender {
 
     @Override
     public void extend() {
-        if (piston.get() != Value.kForward) 
-            piston.set(Value.kForward);
+        if (piston.get() != Value.kForward) piston.set(Value.kForward);
     }
 
     @Override
     public void retract() {
-        if (piston.get() != Value.kReverse) 
-            piston.set(Value.kReverse);
+        if (piston.get() != Value.kReverse) piston.set(Value.kReverse);
     }
 }
