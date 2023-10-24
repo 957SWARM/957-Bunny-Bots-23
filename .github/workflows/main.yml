@@ -1,0 +1,25 @@
+name : Build
+
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+    branches: [main, beta]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+  
+    container: wpilib/roborio-cross-ubuntu:2023-22.04
+    
+    steps:
+      - uses: actions/checkout@v2
+      
+      - name: Grant execute permission to gradle
+        run: chmod +x gradlew
+      
+      - name: Compile
+        run: ./gradlew build -x test -x spotlessApply -x spotlessCheck
+
+      - name: Test
+        run: ./gradlew test -x spotlessApply -x spotlessCheck
