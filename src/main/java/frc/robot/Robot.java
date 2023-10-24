@@ -24,6 +24,8 @@ public class Robot extends TimedRobot {
 
   private DriveControl m_controller = new DriveControl(0);
   private final Drivetrain m_swerve = new Drivetrain(0, 0, 0, 0);
+  private final VisionSubsystem m_visionSubsystem = new VisionSubsystem();
+  private final Limelight m_limelight = new Limelight();
 
   private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
   private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
@@ -33,7 +35,9 @@ public class Robot extends TimedRobot {
   public void robotInit() {}
 
   @Override
-  public void robotPeriodic() {}
+  public void robotPeriodic() {
+    System.out.println("ESTIMED DISTNACE FOMR TARGET: " + m_limelight.getDistanceFromTarget() + " || TX: " + m_limelight.getTx());
+  }
 
   @Override
   public void autonomousInit() {}
@@ -63,7 +67,14 @@ public class Robot extends TimedRobot {
   public void testInit() {}
 
   @Override
-  public void testPeriodic() {}
+  public void testPeriodic() {
+    if(m_controller.getAnother()){
+      m_visionSubsystem.lockOnTarget(m_swerve, m_limelight);
+    }
+    else{
+      m_swerve.drive(0, 0, 0, false);
+    }
+  }
 
   @Override
   public void simulationInit() {}
