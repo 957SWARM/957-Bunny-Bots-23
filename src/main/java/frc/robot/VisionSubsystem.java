@@ -6,6 +6,7 @@ public class VisionSubsystem {
 
     double tapeTx;
     PIDController rotationPID = new PIDController(0.01, 0, 0);
+    double testPIDOutput = rotationPID.calculate(tapeTx, 0);
 
     public void lockOnTarget(Drivetrain drivetrain, Limelight limelight) {
         tapeTx = limelight.getTx();

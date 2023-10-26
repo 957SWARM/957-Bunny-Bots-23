@@ -36,11 +36,14 @@ public class Robot extends TimedRobot {
 
     @Override
     public void robotPeriodic() {
+        /* 
         System.out.println(
                 "ESTIMED DISTNACE FOMR TARGET: "
                         + m_limelight.getDistanceFromTarget()
                         + " || TX: "
-                        + m_limelight.getTx());
+                        + m_limelight.getTx()); */
+        
+        System.out.println(m_visionSubsystem.testPIDOutput);
     }
 
     @Override
