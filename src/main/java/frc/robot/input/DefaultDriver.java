@@ -1,6 +1,7 @@
-package frc.robot.driver_input;
+package frc.robot.input;
 
 import edu.wpi.first.wpilibj.XboxController;
+import frc.utils.DriverInput;
 
 public class DefaultDriver implements DriverInput {
 

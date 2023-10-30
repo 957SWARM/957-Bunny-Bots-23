@@ -1,4 +1,4 @@
-package frc.robot;
+package frc.utils;
 
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.team957.lib.controllers.feedback.PID;
@@ -134,18 +134,11 @@ public class Constants {
     }
 
     public static final class ShooterConstants {
-        public static final double FLYWHEEL_MOMENT_KG_M2 = 1;
-
-        public static final DCMotor FLYWHEEL_DRIVE = DCMotor.getNEO(1).withReduction(2);
-
-        // since this is for a velocity controller, the dimensions of these are *actually*
-        // acceleration and jerk
-        public static final TrapezoidProfile.Constraints MOTION_PROFILE_CONSTRAINTS =
-                new TrapezoidProfile.Constraints(1, 1);
-
-        public static final PID.PIDConstants FEEDBACK_CONSTANTS = new PID.PIDConstants(0, 0, 0);
-
-        public static final int FEEDBACK_INTEGRATION_WINDOW = 25;
+        public static final double BB_TOL = 0;
+        public static final int ENC_A = 0;
+        public static final int ENC_B = 0;
+        public static final boolean ENC_REV = false;
+        public static final int CAN_ID = 0;
     }
 
     public static final class IntakeConstants {
@@ -156,9 +149,9 @@ public class Constants {
     }
 
     public static final class TransferConstants {
-        public static final double CONTROL_WHEEL_CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
-        public static final double CONTROL_WHEEL_HIGH_CURRENT_THRESHOLD_AMPS = 10;
-
-        public static final double CONTROL_WHEEL_RUNNING_VOLTAGE = 10;
+        public static final int CAN_ID = 0;
+        public static final double kp = 0;
+        public static final double ki = 0;
+        public static final double kd = 0;
     }
 }

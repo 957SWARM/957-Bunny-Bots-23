@@ -1,4 +1,4 @@
-package frc.robot.driver_input;
+package frc.utils;
 
 public interface OperatorInput {
 
