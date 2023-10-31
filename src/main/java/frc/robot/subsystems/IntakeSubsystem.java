@@ -1,15 +1,9 @@
 package frc.robot.subsystems;
 
-import java.util.function.BooleanSupplier;
-import java.util.function.DoubleSupplier;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import edu.wpi.first.math.controller.BangBangController;
-import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.utils.Constants.IntakeConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.utils.Constants.ShooterConstants;
 
 /*
  * See the following wiki pages:
@@ -28,9 +22,13 @@ import frc.utils.Constants.ShooterConstants;
 public class IntakeSubsystem extends SubsystemBase{
 
     // TODO: add subsystem dependencies
+    CANSparkMax motor;
     
     public IntakeSubsystem(){
         // TODO: implement the constructor.
+        motor = new CANSparkMax(
+            IntakeConstants.CAN_ID,
+            MotorType.kBrushed);
     }
 
     public void periodic(){
@@ -39,6 +37,10 @@ public class IntakeSubsystem extends SubsystemBase{
 
     public void simulationPeriodic(){
         // TODO: define periodic behavior of the subsystem in a simulation.
+    }
+
+    public void setVoltage(double volts){
+        motor.setVoltage(volts);
     }
 }
 

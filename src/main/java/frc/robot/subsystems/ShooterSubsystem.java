@@ -58,6 +58,10 @@ public class ShooterSubsystem extends SubsystemBase{
     public void simulationPeriodic(){
         // TODO: define periodic behavior of the subsystem in a simulation.
     }
+
+    public void setVoltage(double volts){
+        motor.setVoltage(volts);
+    }
 }
 
 

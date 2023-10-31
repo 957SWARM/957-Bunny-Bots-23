@@ -139,13 +139,15 @@ public class Constants {
         public static final int ENC_B = 0;
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 0;
+        public static final double RUNNING_VOLTAGE = 11;
     }
 
     public static final class IntakeConstants {
         public static final double CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
         public static final double HIGH_CURRENT_THRESHOLD_AMPS = 10;
 
-        public static final double RUNNING_VOLTAGE = 10;
+        public static final double RUNNING_VOLTAGE = 9;
+        public static final int CAN_ID = 0;
     }
 
     public static final class TransferConstants {
