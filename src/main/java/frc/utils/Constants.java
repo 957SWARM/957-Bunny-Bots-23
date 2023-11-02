@@ -162,4 +162,11 @@ public class Constants {
         public static final double TARGETING_KI = 0.0;
         public static final double TARGETING_KD = 0.0;
     }
+
+    // These constants are currently a guess
+    public static final class BunnyExtenderConstants {
+        public static final int MODULE_PORT = 1;
+        public static final int FORWARD_PORT = 1;
+        public static final int REVERSE_PORT = 2;
+    }
 }
