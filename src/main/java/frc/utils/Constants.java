@@ -156,4 +156,10 @@ public class Constants {
         public static final double ki = 0;
         public static final double kd = 0;
     }
+
+    public static final class BunnyGrabberConstants {
+        public static final int MODULE_PORT = 0;
+        public static final int FORWARD_PORT = 1;
+        public static final int REVERSE_PORT = 2;
+    }
 }

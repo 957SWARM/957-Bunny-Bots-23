@@ -1,15 +1,17 @@
 package frc.robot.input;
 
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.utils.DriverInput;
 
 public class DefaultDriver implements DriverInput {
 
-    XboxController xboxController;
+    CommandXboxController xboxController;
 
     public DefaultDriver(int port) {
 
-        xboxController = new XboxController(0);
+        xboxController = new CommandXboxController(0);
     }
 
     @Override
@@ -23,16 +25,21 @@ public class DefaultDriver implements DriverInput {
     }
 
     @Override
-    public boolean swerveFieldRelative() {
-        return xboxController.getStartButton();
+    public Trigger swerveFieldRelative() {
+        return xboxController.start();
     }
 
     @Override
-    public boolean zeroGyro() {
-        return xboxController.getBackButton();
+    public Trigger zeroGyro() {
+        return xboxController.back();
     }
 
     public double swerveRot() {
         return xboxController.getRightX();
     }
+
+    public Trigger toggleGrabber(){
+        return xboxController.a();
+    }
+    
 }
