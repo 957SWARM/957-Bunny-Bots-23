@@ -22,6 +22,7 @@ import frc.robot.commands.FlywheelControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.microsystems.RobotState;
+import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.utils.Constants.AutoConstants;
@@ -38,7 +39,8 @@ public class RobotContainer {
 
     // Subsystems
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    private final ShooterSubsystem shooter = new ShooterSubsystem();
+    private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+    private final BunnyGrabberSubsystem m_grabber = new BunnyGrabberSubsystem();
 
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
@@ -64,8 +66,8 @@ public class RobotContainer {
                     true, true),
                 m_robotDrive));
         
-        shooter.setDefaultCommand(
-            new FlywheelControlCommand(shooter, () -> targetFlywheelRPM)
+        m_shooter.setDefaultCommand(
+            new FlywheelControlCommand(m_shooter, () -> targetFlywheelRPM)
         );
 
         // Configure the trigger bindings
@@ -77,7 +79,7 @@ public class RobotContainer {
      * See wiki pages on Triggers for documentation.
      */
     private void configureBindings() {
-
+        driver.toggleGrabber().onTrue(m_grabber.extendBunnyGrabber());
     }
 
     public void stateMachinePeriodic(){

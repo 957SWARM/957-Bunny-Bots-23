@@ -1,14 +1,18 @@
 package frc.utils;
 
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+
 public interface DriverInput {
 
     public double swerveX();
 
     public double swerveY();
 
-    public boolean swerveFieldRelative();
+    public Trigger swerveFieldRelative();
 
-    public boolean zeroGyro();
+    public Trigger zeroGyro();
 
     public double swerveRot();
+
+    public Trigger toggleGrabber();
 }
