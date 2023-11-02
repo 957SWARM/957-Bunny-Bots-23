@@ -156,4 +156,10 @@ public class Constants {
         public static final double ki = 0;
         public static final double kd = 0;
     }
+
+    public static final class VisionTargetingConstants {
+        public static final double TARGETING_KP = 0.0;
+        public static final double TARGETING_KI = 0.0;
+        public static final double TARGETING_KD = 0.0;
+    }
 }

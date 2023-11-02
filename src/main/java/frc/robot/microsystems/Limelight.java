@@ -4,7 +4,9 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public class Limelight {
+public final class Limelight{
+
+    private static Limelight INSTANCE;
 
     // Variables
     private final double targetHeight = 1.44; // Meters
@@ -27,6 +29,17 @@ public class Limelight {
     DoubleSubscriber vertSub = table.getDoubleTopic("tvert").subscribe(0);
     DoubleSubscriber jsonSub = table.getDoubleTopic("tjson").subscribe(0);
     DoubleSubscriber getpipeSub = table.getDoubleTopic("getpipe").subscribe(0);
+
+
+    private Limelight(){}
+
+    public static Limelight getInstance(){
+        if (INSTANCE == null) {
+            INSTANCE = new Limelight();
+        }
+        
+        return INSTANCE;
+    }
 
     // Whether or not a target is seen
     public double getTv() {
