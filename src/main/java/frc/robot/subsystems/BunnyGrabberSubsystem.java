@@ -18,7 +18,7 @@ public class BunnyGrabberSubsystem extends SubsystemBase {
                         PneumaticsModuleType.REVPH,
                         Constants.BunnyGrabberConstants.FORWARD_PORT,
                         Constants.BunnyGrabberConstants.REVERSE_PORT);
-                        piston.set(Value.kReverse);
+        piston.set(Value.kReverse);
     }
 
     public CommandBase extendBunnyGrabber() {

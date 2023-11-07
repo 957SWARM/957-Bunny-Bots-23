@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -13,7 +14,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.Constants.DriveConstants;
 import frc.utils.SwerveUtils;
@@ -45,7 +45,7 @@ public class DriveSubsystem extends SubsystemBase {
                     DriveConstants.kBackRightChassisAngularOffset);
 
     // The gyro sensor
-    private final ADIS16470_IMU m_gyro = new ADIS16470_IMU();
+    private final AHRS m_gyro = new AHRS();
 
     // Slew rate filter variables for controlling lateral acceleration
     private double m_currentRotation = 0.0;

@@ -42,8 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getRPM() {
-        // TODO: return the RPM from the encoder.
-        return 0;
+        return (encoder.getRate() / 2048) / 4;
     }
 
     public void periodic() {

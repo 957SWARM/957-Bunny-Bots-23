@@ -16,6 +16,7 @@ public class FlywheelControlCommand extends CommandBase {
         this.shooter = shooter;
         this.targetRPM = targetRPM;
         bb = new BangBangController();
+        addRequirements(shooter);
     }
 
     public void execute() {

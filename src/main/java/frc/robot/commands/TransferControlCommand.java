@@ -11,9 +11,10 @@ public class TransferControlCommand extends CommandBase {
     public TransferControlCommand(TransferSubsystem transfer, BooleanSupplier enableTransfer) {
         this.transfer = transfer;
         this.enableTransfer = enableTransfer;
+        addRequirements(transfer);
     }
 
     public void execute() {
-        // TODO: Implement the functionality of the command.
+        transfer.set(enableTransfer.getAsBoolean());
     }
 }
