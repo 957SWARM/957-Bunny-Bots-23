@@ -1,6 +1,5 @@
 package frc.robot.input;
 
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.utils.DriverInput;
@@ -38,8 +37,7 @@ public class DefaultDriver implements DriverInput {
         return xboxController.getRightX();
     }
 
-    public Trigger toggleGrabber(){
+    public Trigger toggleGrabber() {
         return xboxController.a();
     }
-    
 }

@@ -2,8 +2,8 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import frc.utils.Constants.IntakeConstants;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.utils.Constants.IntakeConstants;
 
 /*
  * See the following wiki pages:
@@ -19,29 +19,25 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
  * using standard PercentOutput.
  */
 
-public class IntakeSubsystem extends SubsystemBase{
+public class IntakeSubsystem extends SubsystemBase {
 
     // TODO: add subsystem dependencies
     CANSparkMax motor;
-    
-    public IntakeSubsystem(){
+
+    public IntakeSubsystem() {
         // TODO: implement the constructor.
-        motor = new CANSparkMax(
-            IntakeConstants.CAN_ID,
-            MotorType.kBrushed);
+        motor = new CANSparkMax(IntakeConstants.CAN_ID, MotorType.kBrushed);
     }
 
-    public void periodic(){
+    public void periodic() {
         // TODO: define periodic behavior of the subsystem.
     }
 
-    public void simulationPeriodic(){
+    public void simulationPeriodic() {
         // TODO: define periodic behavior of the subsystem in a simulation.
     }
 
-    public void setVoltage(double volts){
+    public void setVoltage(double volts) {
         motor.setVoltage(volts);
     }
 }
-
-
