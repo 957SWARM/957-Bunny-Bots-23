@@ -16,6 +16,7 @@ import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.commands.BasicVisionTargetingCommand;
 import frc.robot.commands.FlywheelControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
@@ -82,6 +83,10 @@ public class RobotContainer {
      */
     private void configureBindings() {
         driver.toggleGrabber().onTrue(m_grabber.toggleBunnyGrabber());
+        driver.visionTargerting().toggleOnTrue(new BasicVisionTargetingCommand(
+            m_robotDrive, 
+            () -> -MathUtil.applyDeadband(driver.swerveY(), OIConstants.kDriveDeadband), 
+            () -> -MathUtil.applyDeadband(driver.swerveX(), OIConstants.kDriveDeadband)));
     }
 
     public void stateMachinePeriodic() {

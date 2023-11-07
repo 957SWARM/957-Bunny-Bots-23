@@ -15,4 +15,6 @@ public interface DriverInput {
     public double swerveRot();
 
     public Trigger toggleGrabber();
+
+    public Trigger visionTargerting();
 }

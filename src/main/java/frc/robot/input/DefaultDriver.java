@@ -40,4 +40,8 @@ public class DefaultDriver implements DriverInput {
     public Trigger toggleGrabber() {
         return xboxController.a();
     }
+
+    public Trigger visionTargerting(){
+        return xboxController.b();
+    }
 }
