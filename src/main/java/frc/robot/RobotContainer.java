@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.List;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -22,6 +20,7 @@ import frc.robot.commands.FlywheelControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.microsystems.RobotState;
+import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.utils.Constants.AutoConstants;
@@ -29,6 +28,7 @@ import frc.utils.Constants.DriveConstants;
 import frc.utils.Constants.OIConstants;
 import frc.utils.DriverInput;
 import frc.utils.OperatorInput;
+import java.util.List;
 
 public class RobotContainer {
 
@@ -38,7 +38,8 @@ public class RobotContainer {
 
     // Subsystems
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    private final ShooterSubsystem shooter = new ShooterSubsystem();
+    private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+    private final BunnyGrabberSubsystem m_grabber = new BunnyGrabberSubsystem();
 
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
@@ -52,20 +53,23 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
-        
-
         // Configure default commands
         m_robotDrive.setDefaultCommand(
-            new RunCommand(
-                () -> m_robotDrive.drive(
-                    -MathUtil.applyDeadband(driver.swerveY(), OIConstants.kDriveDeadband),
-                    -MathUtil.applyDeadband(driver.swerveX(), OIConstants.kDriveDeadband),
-                    -MathUtil.applyDeadband(driver.swerveRot(), OIConstants.kDriveDeadband),
-                    true, true),
-                m_robotDrive));
-        
-        shooter.setDefaultCommand(
-            new FlywheelControlCommand(shooter, () -> targetFlywheelRPM)
+                new RunCommand(
+                        () ->
+                                m_robotDrive.drive(
+                                        -MathUtil.applyDeadband(
+                                                driver.swerveY(), OIConstants.kDriveDeadband),
+                                        -MathUtil.applyDeadband(
+                                                driver.swerveX(), OIConstants.kDriveDeadband),
+                                        -MathUtil.applyDeadband(
+                                                driver.swerveRot(), OIConstants.kDriveDeadband),
+                                        true,
+                                        true),
+                        m_robotDrive));
+
+        m_shooter.setDefaultCommand(
+            new FlywheelControlCommand(m_shooter, () -> targetFlywheelRPM)
         );
 
         // Configure the trigger bindings
@@ -77,73 +81,78 @@ public class RobotContainer {
      * See wiki pages on Triggers for documentation.
      */
     private void configureBindings() {
-
+        driver.toggleGrabber().onTrue(m_grabber.toggleBunnyGrabber());
     }
 
-    public void stateMachinePeriodic(){
-        switch(ballPathState){
+    public void stateMachinePeriodic() {
+        switch (ballPathState) {
             case IDLE:
-                // TODO: finish state machine 
+                // TODO: finish state machine
                 // TODO: add logic to move between states
                 break;
             case EJECT:
-                // TODO: finish state machine 
+                // TODO: finish state machine
                 // TODO: add logic to move between states
                 break;
             case INTAKE:
-                // TODO: finish state machine 
+                // TODO: finish state machine
                 // TODO: add logic to move between states
                 break;
             case SHOOT:
-                // TODO: finish state machine 
+                // TODO: finish state machine
                 // TODO: add logic to move between states
                 break;
             default:
                 break;
         }
     }
-    
+
     public Command getAutonomousCommand() {
 
         // Create config for trajectory
-        TrajectoryConfig config = new TrajectoryConfig(
-            AutoConstants.kMaxSpeedMetersPerSecond,
-            AutoConstants.kMaxAccelerationMetersPerSecondSquared)
-            // Add kinematics to ensure max speed is actually obeyed
-            .setKinematics(DriveConstants.kDriveKinematics);
+        TrajectoryConfig config =
+                new TrajectoryConfig(
+                                AutoConstants.kMaxSpeedMetersPerSecond,
+                                AutoConstants.kMaxAccelerationMetersPerSecondSquared)
+                        // Add kinematics to ensure max speed is actually obeyed
+                        .setKinematics(DriveConstants.kDriveKinematics);
 
         // An example trajectory to follow. All units in meters.
-        Trajectory exampleTrajectory = TrajectoryGenerator.generateTrajectory(
-            // Start at the origin facing the +X direction
-            new Pose2d(0, 0, new Rotation2d(0)),
-            // Pass through these two interior waypoints, making an 's' curve path
-            List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
-            // End 3 meters straight ahead of where we started, facing forward
-            new Pose2d(3, 0, new Rotation2d(0)),
-            config);
+        Trajectory exampleTrajectory =
+                TrajectoryGenerator.generateTrajectory(
+                        // Start at the origin facing the +X direction
+                        new Pose2d(0, 0, new Rotation2d(0)),
+                        // Pass through these two interior waypoints, making an 's' curve path
+                        List.of(new Translation2d(1, 1), new Translation2d(2, -1)),
+                        // End 3 meters straight ahead of where we started, facing forward
+                        new Pose2d(3, 0, new Rotation2d(0)),
+                        config);
 
-        var thetaController = new ProfiledPIDController(
-            AutoConstants.kPThetaController, 0, 0, AutoConstants.kThetaControllerConstraints);
+        var thetaController =
+                new ProfiledPIDController(
+                        AutoConstants.kPThetaController,
+                        0,
+                        0,
+                        AutoConstants.kThetaControllerConstraints);
         thetaController.enableContinuousInput(-Math.PI, Math.PI);
 
-        SwerveControllerCommand swerveControllerCommand = new SwerveControllerCommand(
-            exampleTrajectory,
-            m_robotDrive::getPose, // Functional interface to feed supplier
-            DriveConstants.kDriveKinematics,
+        SwerveControllerCommand swerveControllerCommand =
+                new SwerveControllerCommand(
+                        exampleTrajectory,
+                        m_robotDrive::getPose, // Functional interface to feed supplier
+                        DriveConstants.kDriveKinematics,
 
-            // Position controllers
-            new PIDController(AutoConstants.kPXController, 0, 0),
-            new PIDController(AutoConstants.kPYController, 0, 0),
-            thetaController,
-            m_robotDrive::setModuleStates,
-            m_robotDrive);
+                        // Position controllers
+                        new PIDController(AutoConstants.kPXController, 0, 0),
+                        new PIDController(AutoConstants.kPYController, 0, 0),
+                        thetaController,
+                        m_robotDrive::setModuleStates,
+                        m_robotDrive);
 
         // Reset odometry to the starting pose of the trajectory.
         m_robotDrive.resetOdometry(exampleTrajectory.getInitialPose());
 
         // Run path following command, then stop at the end.
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
-
     }
-  
 }
