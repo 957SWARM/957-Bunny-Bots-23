@@ -1,10 +1,8 @@
 package frc.utils;
 
 import com.revrobotics.CANSparkMax.IdleMode;
-import com.team957.lib.controllers.feedback.PID;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -155,5 +153,11 @@ public class Constants {
         public static final double kp = 0;
         public static final double ki = 0;
         public static final double kd = 0;
+    }
+
+    public static final class BunnyGrabberConstants {
+        public static final int MODULE_PORT = 14;
+        public static final int FORWARD_PORT = 0;
+        public static final int REVERSE_PORT = 1;
     }
 }

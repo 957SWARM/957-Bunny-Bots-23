@@ -1,12 +1,10 @@
 package frc.robot.subsystems;
 
-import java.util.function.DoubleSupplier;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.Constants.ShooterConstants;
 
@@ -24,44 +22,39 @@ import frc.utils.Constants.ShooterConstants;
  * using standard PercentOutput.
  */
 
-public class ShooterSubsystem extends SubsystemBase{
+public class ShooterSubsystem extends SubsystemBase {
 
     private final CANSparkMax motor;
     private final BangBangController bb;
     private final Encoder encoder;
-    
-    public ShooterSubsystem(){
-        motor = new CANSparkMax(
-            ShooterConstants.CAN_ID,
-            MotorType.kBrushless);
-        
+
+    public ShooterSubsystem() {
+        motor = new CANSparkMax(ShooterConstants.CAN_ID, MotorType.kBrushless);
+
         bb = new BangBangController(ShooterConstants.BB_TOL);
 
-        encoder = new Encoder(
-            ShooterConstants.ENC_A,
-            ShooterConstants.ENC_B,
-            ShooterConstants.ENC_REV);
+        encoder =
+                new Encoder(
+                        ShooterConstants.ENC_A, ShooterConstants.ENC_B, ShooterConstants.ENC_REV);
 
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kCoast);
     }
 
-    public double getRPM(){
+    public double getRPM() {
         // TODO: return the RPM from the encoder.
         return 0;
     }
 
-    public void periodic(){
+    public void periodic() {
         // TODO: define periodic behavior of the subsystem.
     }
 
-    public void simulationPeriodic(){
+    public void simulationPeriodic() {
         // TODO: define periodic behavior of the subsystem in a simulation.
     }
 
-    public void setVoltage(double volts){
+    public void setVoltage(double volts) {
         motor.setVoltage(volts);
     }
 }
-
-
