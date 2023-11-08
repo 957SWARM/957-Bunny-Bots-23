@@ -15,8 +15,9 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj.ADIS16470_IMU;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.utils.Constants.DriveConstants;
-import frc.utils.SwerveUtils;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.util.MAXSwerveModule;
+import frc.robot.util.SwerveUtils;
 
 public class DriveSubsystem extends SubsystemBase {
     // Create MAXSwerveModules
