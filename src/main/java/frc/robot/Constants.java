@@ -1,6 +1,7 @@
 package frc.robot;
 
 import com.revrobotics.CANSparkMax.IdleMode;
+import com.team957.lib.controllers.feedback.PID.PIDConstants;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
@@ -28,6 +29,15 @@ public class Constants {
                         new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
                         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
                         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+
+        // TODO input actual numbers
+        public static final Translation2d FRONT_LEFT_TRANSFORM = new Translation2d(-1, 1);
+        public static final Translation2d FRONT_RIGHT_TRANSFORM = new Translation2d(1, 1);
+        public static final Translation2d BACK_RIGHT_TRANSFORM = new Translation2d(1, -1);
+        public static final Translation2d BACK_LEFT_TRANSFORM = new Translation2d(-1, -1);
+
+        public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(1, 0, 0);
+        public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(1, 0, 0);
 
         // Angular offsets of the modules relative to the chassis in radians
         public static final double kFrontLeftChassisAngularOffset = 0; // (-pi/2)
