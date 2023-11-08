@@ -172,4 +172,10 @@ public class Constants {
         public static final double AUTOMATION = -0.57;
         public static final double SECOND_AUTOMATION = -0.89;
     }
+
+    public static final class IMUConstants {
+        public static final boolean YAW_AXIS_INVERTED = true;
+        // this should NOT be applied to the navx.getRotation2D(), that's already offset
+        // this is for the angular rate
+    }
 }
