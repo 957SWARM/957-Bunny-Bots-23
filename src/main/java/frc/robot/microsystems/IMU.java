@@ -6,6 +6,10 @@ import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
 
 public class IMU {
+    public static final IMU instance = new IMU();
+
+    private IMU() {}
+
     private final AHRS navx = new AHRS();
 
     private Rotation2d angleOffset = new Rotation2d();
