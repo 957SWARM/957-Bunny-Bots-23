@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.utils.Constants;
+import frc.robot.Constants;
 
 public class BunnyGrabberSubsystem extends SubsystemBase {
 
@@ -18,7 +18,7 @@ public class BunnyGrabberSubsystem extends SubsystemBase {
                         PneumaticsModuleType.REVPH,
                         Constants.BunnyGrabberConstants.FORWARD_PORT,
                         Constants.BunnyGrabberConstants.REVERSE_PORT);
-                        piston.set(Value.kReverse);
+        piston.set(Value.kReverse);
     }
 
     public CommandBase extendBunnyGrabber() {

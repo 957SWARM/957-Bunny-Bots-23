@@ -1,4 +1,4 @@
-package frc.utils;
+package frc.robot.input;
 
 public interface OperatorInput {
 
