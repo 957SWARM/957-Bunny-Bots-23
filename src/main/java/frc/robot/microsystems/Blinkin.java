@@ -1,8 +1,10 @@
-// It's Blinkin' Time!
+/*It's Blinkin' Time!
+Time to Blink all over the place!*/
 
 package frc.robot.microsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.utils.Constants.BlinkinConstants;
 
 public class Blinkin {
 
@@ -16,34 +18,34 @@ public class Blinkin {
     // No balls
     public void green() {
 
-        motor.set(0.73);
+        motor.set(BlinkinConstants.GREEN);
     }
 
     // Full balls
     public void red() {
 
-        motor.set(0.61);
+        motor.set(BlinkinConstants.RED);
     }
 
     // 1-2 Balls
     public void gold() {
 
-        motor.set(0.67);
+        motor.set(BlinkinConstants.GOLD);
     }
 
     // 3-4 Balls
     public void redOrange() {
 
-        motor.set(0.63);
+        motor.set(BlinkinConstants.REDORANGE);
     }
 
     public void automation() {
 
-        motor.set(-0.57);
+        motor.set(BlinkinConstants.AUTOMATION);
     }
 
     public void secondAutomation() {
 
-        motor.set(-0.89);
+        motor.set(BlinkinConstants.SECOND_AUTOMATION);
     }
 }

@@ -5,6 +5,7 @@ import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.utils.Constants.IntakeConstants;
 
@@ -26,11 +27,16 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // TODO: add subsystem dependencies
     TalonSRX motor;
+    DigitalInput input = new DigitalInput(0);
 
     public IntakeSubsystem() {
         // TODO: implement the constructor.
         motor = new TalonSRX(IntakeConstants.CAN_ID);
     
+    }
+
+    public boolean isBeamBroken(){
+        return !input.get();
     }
 
     public void periodic() {
@@ -41,13 +47,7 @@ public class IntakeSubsystem extends SubsystemBase {
         // TODO: define periodic behavior of the subsystem in a simulation.
     }
 
-    public void setPercent(double percent) {
-        if(percent >= 1){
-            motor.set(ControlMode.PercentOutput, 1);
-        }else if(percent <= -1){
-            motor.set(ControlMode.PercentOutput, -1);
-        }else{
-            motor.set(ControlMode.PercentOutput, percent);
-        }
+    public void setVoltage(double voltage){
+        motor.set(ControlMode.PercentOutput, voltage/IntakeConstants.MAX_RUNNING_VOLTAGE);
     }
 }

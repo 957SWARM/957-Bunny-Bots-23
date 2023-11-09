@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import java.util.List;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -13,20 +15,22 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import frc.robot.commands.TransferControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.microsystems.RobotState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.TransferSubsystem;
 import frc.utils.Constants.AutoConstants;
 import frc.utils.Constants.DriveConstants;
 import frc.utils.Constants.OIConstants;
 import frc.utils.DriverInput;
 import frc.utils.OperatorInput;
-import java.util.List;
 
 public class RobotContainer {
 
@@ -38,12 +42,20 @@ public class RobotContainer {
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
     // private final ShooterSubsystem m_shooter = new ShooterSubsystem();
     private final BunnyGrabberSubsystem m_grabber = new BunnyGrabberSubsystem();
+    private final TransferSubsystem m_transfer = new TransferSubsystem();
 
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
+    public double currentFlywheelRPM = 0;
     public double targetFlywheelRPM = 0;
     public boolean enableIntake = false;
     public boolean enableTransfer = false;
+
+    // Ball Intake
+    DigitalInput input;
+    int ballCount = 0; 
+    double breakBeamDelay = 0.0;
+
 
     /*
      * RobotContainer Constructor.
@@ -69,6 +81,10 @@ public class RobotContainer {
         // m_shooter.setDefaultCommand(new FlywheelControlCommand(m_shooter, () ->
         // targetFlywheelRPM));
 
+        m_transfer.setDefaultCommand(
+            new TransferControlCommand(m_transfer, () -> enableTransfer, () -> currentFlywheelRPM, () -> targetFlywheelRPM)
+        );
+
         // Configure the trigger bindings
         configureBindings();
     }
@@ -82,6 +98,11 @@ public class RobotContainer {
     }
 
     public void stateMachinePeriodic() {
+        if(!input.get() && breakBeamDelay > 0.2){
+            breakBeamDelay = 0.0;
+            ballCount++;
+        }
+
         switch (ballPathState) {
             case IDLE:
                 // TODO: finish state machine
@@ -102,6 +123,8 @@ public class RobotContainer {
             default:
                 break;
         }
+
+        breakBeamDelay =+ 0.02;
     }
 
     public Command getAutonomousCommand() {

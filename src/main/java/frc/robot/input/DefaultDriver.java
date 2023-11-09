@@ -40,4 +40,20 @@ public class DefaultDriver implements DriverInput {
     public Trigger toggleGrabber() {
         return xboxController.a();
     }
+
+    public boolean cancel() {
+        return xboxController.back().getAsBoolean();
+    }
+
+    public boolean shoot() {
+        return xboxController.back().getAsBoolean();
+    }
+
+    public boolean eject() {
+        return xboxController.back().getAsBoolean();
+    }
+
+    public boolean intake() {
+        return xboxController.back().getAsBoolean();
+    }
 }

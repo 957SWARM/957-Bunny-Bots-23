@@ -144,6 +144,7 @@ public class Constants {
         public static final double CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
         public static final double HIGH_CURRENT_THRESHOLD_AMPS = 10;
 
+        public static final double MAX_RUNNING_VOLTAGE = 12;
         public static final double RUNNING_VOLTAGE = 9;
         public static final int CAN_ID = 0;
     }
@@ -153,11 +154,22 @@ public class Constants {
         public static final double kp = 0;
         public static final double ki = 0;
         public static final double kd = 0;
+        public static final int RPM_TOLERANCE = 20;
+        public static final double TRANSFER_PERCENT_POWER = .6;
     }
 
     public static final class BunnyGrabberConstants {
         public static final int MODULE_PORT = 14;
         public static final int FORWARD_PORT = 0;
         public static final int REVERSE_PORT = 1;
+    }
+
+    public static final class BlinkinConstants{
+        public static final double GREEN = 0.73;
+        public static final double RED = 0.61;
+        public static final double GOLD = 0.67;
+        public static final double REDORANGE = 0.63;
+        public static final double AUTOMATION = -0.57;
+        public static final double SECOND_AUTOMATION = -0.89;
     }
 }
