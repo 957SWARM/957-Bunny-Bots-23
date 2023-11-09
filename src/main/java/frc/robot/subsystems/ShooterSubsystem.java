@@ -3,6 +3,8 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.team957.lib.math.filters.ExponentialMovingAverage;
+
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -27,6 +29,7 @@ public class ShooterSubsystem extends SubsystemBase {
     private final CANSparkMax motor;
     private final BangBangController bb;
     private final Encoder encoder;
+    private ExponentialMovingAverage average;
 
     public ShooterSubsystem() {
         motor = new CANSparkMax(ShooterConstants.CAN_ID, MotorType.kBrushless);
@@ -42,11 +45,16 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public double getRPM() {
-        return (encoder.getRate() / 2048) / 4;
+        return (encoder.getRate() / 2048.0) / 4.0;
+    }
+
+    public boolean aboveThreshold(double average, double threshold){
+        return average > threshold;
     }
 
     public void periodic() {
         // TODO: define periodic behavior of the subsystem.
+        average.calculate(motor.getOutputCurrent());
     }
 
     public void simulationPeriodic() {

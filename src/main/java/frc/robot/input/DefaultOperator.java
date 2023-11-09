@@ -1,7 +1,6 @@
 package frc.robot.input;
 
 import edu.wpi.first.wpilibj.XboxController;
-import frc.utils.OperatorInput;
 
 public class DefaultOperator implements OperatorInput {
 
