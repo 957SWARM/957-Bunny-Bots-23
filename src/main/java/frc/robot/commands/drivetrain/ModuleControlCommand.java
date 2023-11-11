@@ -2,16 +2,20 @@ package frc.robot.commands.drivetrain;
 
 import com.team957.lib.controllers.feedback.PID;
 import com.team957.lib.util.DeltaTimeUtil;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DriveSubsystem.MaxSwerveModule;
-import java.util.function.DoubleSupplier;
+import java.util.Set;
+import java.util.function.Supplier;
 
 /** Command for direct control of module states. */
-public class ModuleControlCommand extends CommandBase {
+public class ModuleControlCommand implements Command {
     private class ModuleContainer {
-        final ModuleSetpoint setpoint;
+        final Supplier<SwerveModuleState> setpoint;
 
         final MaxSwerveModule module;
 
@@ -19,14 +23,20 @@ public class ModuleControlCommand extends CommandBase {
         final PID steerController =
                 new PID(Constants.DriveConstants.STEER_FEEDBACK_CONSTANTS, 0, true);
 
-        ModuleContainer(ModuleSetpoint setpoint, MaxSwerveModule module) {
+        ModuleContainer(Supplier<SwerveModuleState> setpoint, MaxSwerveModule module) {
             this.setpoint = setpoint;
             this.module = module;
         }
     }
 
-    public static record ModuleSetpoint(
-            DoubleSupplier driveVelocityMetersPerSecond, DoubleSupplier steerPositionRadians) {}
+    public static record CombinedModuleSetpoints(
+            SwerveModuleState frontRight,
+            SwerveModuleState frontLeft,
+            SwerveModuleState backLeft,
+            SwerveModuleState backRight) {}
+    // this redundant record exists so that the command can be done in a single lambda, as is
+    // the weird packing and unpacking of the lambda
+    // doing it in multiple lambdas causes different modules to get setpoints that *slightly* clash.
 
     private final ModuleContainer frontRight;
     private final ModuleContainer frontLeft;
@@ -35,20 +45,25 @@ public class ModuleControlCommand extends CommandBase {
 
     private final DeltaTimeUtil dtUtil;
 
+    private final DriveSubsystem drive;
+
     public ModuleControlCommand(
-            DriveSubsystem drive,
-            ModuleSetpoint frontRight,
-            ModuleSetpoint frontLeft,
-            ModuleSetpoint backLeft,
-            ModuleSetpoint backRight) {
-        this.frontRight = new ModuleContainer(frontRight, drive.frontRight);
-        this.frontLeft = new ModuleContainer(frontLeft, drive.frontLeft);
-        this.backLeft = new ModuleContainer(backLeft, drive.backLeft);
-        this.backRight = new ModuleContainer(backRight, drive.backRight);
+            DriveSubsystem drive, Supplier<CombinedModuleSetpoints> moduleSetpoints) {
+        this.frontRight =
+                new ModuleContainer(() -> moduleSetpoints.get().frontRight, drive.frontRight);
+        this.frontLeft =
+                new ModuleContainer(() -> moduleSetpoints.get().frontLeft, drive.frontLeft);
+        this.backLeft = new ModuleContainer(() -> moduleSetpoints.get().backLeft, drive.backLeft);
+        this.backRight =
+                new ModuleContainer(() -> moduleSetpoints.get().backRight, drive.backRight);
 
         this.dtUtil = new DeltaTimeUtil();
 
-        addRequirements(drive);
+        this.drive = drive;
+    }
+
+    public Set<Subsystem> getRequirements() {
+        return Set.of(drive);
     }
 
     @Override
@@ -57,10 +72,14 @@ public class ModuleControlCommand extends CommandBase {
 
         for (ModuleContainer module :
                 new ModuleContainer[] {frontRight, frontLeft, backLeft, backRight}) {
-            module.driveController.setSetpoint(
-                    module.setpoint.driveVelocityMetersPerSecond.getAsDouble());
+            SwerveModuleState setpoint =
+                    SwerveModuleState.optimize(
+                            module.setpoint.get(),
+                            new Rotation2d(module.module.getSteerPositionRadians()));
 
-            module.steerController.setSetpoint(module.setpoint.steerPositionRadians.getAsDouble());
+            module.driveController.setSetpoint(setpoint.speedMetersPerSecond);
+
+            module.steerController.setSetpoint(setpoint.angle.getRadians());
 
             module.module.setDriveControlInput(
                     module.driveController.calculate(

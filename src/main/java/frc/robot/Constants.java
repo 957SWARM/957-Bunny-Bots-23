@@ -12,6 +12,9 @@ public class Constants {
 
     public static final class DriveConstants {
         // TODO input actual numbers
+
+        public static final double WHEEL_MAX_SPEED_METERS_PER_SECOND = 3;
+
         public static final Translation2d FRONT_LEFT_TRANSFORM = new Translation2d(-1, 1);
         public static final Translation2d FRONT_RIGHT_TRANSFORM = new Translation2d(1, 1);
         public static final Translation2d BACK_RIGHT_TRANSFORM = new Translation2d(1, -1);
