@@ -4,11 +4,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.team957.lib.math.filters.ExponentialMovingAverage;
-
-import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.utils.Constants.ShooterConstants;
+import frc.robot.Constants.ShooterConstants;
 
 /*
  * See the following wiki pages:
@@ -27,14 +25,11 @@ import frc.utils.Constants.ShooterConstants;
 public class ShooterSubsystem extends SubsystemBase {
 
     private final CANSparkMax motor;
-    private final BangBangController bb;
     private final Encoder encoder;
     private ExponentialMovingAverage average;
 
     public ShooterSubsystem() {
         motor = new CANSparkMax(ShooterConstants.CAN_ID, MotorType.kBrushless);
-
-        bb = new BangBangController(ShooterConstants.BB_TOL);
 
         encoder =
                 new Encoder(
@@ -48,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
         return (encoder.getRate() / 2048.0) / 4.0;
     }
 
-    public boolean aboveThreshold(double average, double threshold){
+    public boolean aboveThreshold(double average, double threshold) {
         return average > threshold;
     }
 

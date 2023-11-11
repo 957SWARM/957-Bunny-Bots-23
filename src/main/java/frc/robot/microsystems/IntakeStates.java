@@ -1,9 +1,8 @@
 package frc.robot.microsystems;
 
-import frc.utils.Constants.IntakeConstants;;
+import frc.robot.Constants.IntakeConstants;
 
 public enum IntakeStates {
-
     EJECT(-IntakeConstants.RUNNING_VOLTAGE, "Eject"),
     INTAKE(IntakeConstants.RUNNING_VOLTAGE, "Intake"),
     IDLE(0, "Idle");

@@ -4,7 +4,7 @@ Time to Blink all over the place!*/
 package frc.robot.microsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import frc.utils.Constants.BlinkinConstants;
+import frc.robot.Constants.BlinkinConstants;
 
 public class Blinkin {
 

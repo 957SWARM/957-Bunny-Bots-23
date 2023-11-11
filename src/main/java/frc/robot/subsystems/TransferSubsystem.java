@@ -1,12 +1,8 @@
 package frc.robot.subsystems;
 
-import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
-import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.utils.Constants.TransferConstants;
+import frc.robot.Constants.TransferConstants;
 
 public class TransferSubsystem extends SubsystemBase {
 
@@ -20,19 +16,11 @@ public class TransferSubsystem extends SubsystemBase {
         isEnabled = false;
     }
 
-    public void periodic() {
-        // TODO: define periodic behavior of the subsystem.
-    }
-
-    public void simulationPeriodic() {
-        // TODO: define periodic behavior of the subsystem in a simulation.
-    }
-
     public void on() {
         motor.set(ControlMode.PercentOutput, TransferConstants.TRANSFER_PERCENT_POWER);
     }
 
-    public void off(){
+    public void off() {
         motor.set(ControlMode.PercentOutput, 0);
     }
 }
