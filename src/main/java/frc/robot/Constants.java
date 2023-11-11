@@ -39,6 +39,8 @@ public class Constants {
         public static final int BACK_LEFT_STEER_CANID = 12;
 
         // the offset is the "raw" value reported when the module is at the "zero" position
+
+        // last updated: NOT REAL VALUES
         public static final double FRONT_LEFT_OFFSET_RADIANS = 0;
         public static final double FRONT_RIGHT_OFFSET_RADIANS = 0;
         public static final double BACK_RIGHT_OFFSET_RADIANS = 0;
