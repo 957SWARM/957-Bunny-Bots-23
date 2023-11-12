@@ -8,7 +8,7 @@ import com.team957.lib.math.filters.ExponentialMovingAverage;
 import edu.wpi.first.math.controller.BangBangController;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.utils.Constants.ShooterConstants;
+import frc.robot.Constants.ShooterConstants;
 
 /*
  * See the following wiki pages:

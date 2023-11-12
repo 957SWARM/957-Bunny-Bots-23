@@ -22,7 +22,7 @@ import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.FlywheelControlCommand;
+import frc.robot.commands.TransferControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
