@@ -29,7 +29,7 @@ public class TransferSubsystem extends SubsystemBase {
         motor.set(ControlMode.PercentOutput, TransferConstants.TRANSFER_PERCENT_POWER);
     }
 
-    public void off(){
+    public void off() {
         motor.set(ControlMode.PercentOutput, 0);
     }
 }

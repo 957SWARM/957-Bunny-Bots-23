@@ -164,7 +164,7 @@ public class Constants {
         public static final int REVERSE_PORT = 1;
     }
 
-    public static final class BlinkinConstants{
+    public static final class BlinkinConstants {
         public static final double GREEN = 0.73;
         public static final double RED = 0.61;
         public static final double GOLD = 0.67;

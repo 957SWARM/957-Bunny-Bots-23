@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import java.util.List;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -31,6 +29,7 @@ import frc.robot.microsystems.RobotState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
+import java.util.List;
 
 public class RobotContainer {
 
@@ -53,9 +52,8 @@ public class RobotContainer {
 
     // Ball Intake
     DigitalInput input;
-    int ballCount = 0; 
+    int ballCount = 0;
     double breakBeamDelay = 0.0;
-
 
     /*
      * RobotContainer Constructor.
@@ -82,8 +80,11 @@ public class RobotContainer {
         // targetFlywheelRPM));
 
         m_transfer.setDefaultCommand(
-            new TransferControlCommand(m_transfer, () -> enableTransfer, () -> currentFlywheelRPM, () -> targetFlywheelRPM)
-        );
+                new TransferControlCommand(
+                        m_transfer,
+                        () -> enableTransfer,
+                        () -> currentFlywheelRPM,
+                        () -> targetFlywheelRPM));
 
         // Configure the trigger bindings
         configureBindings();
@@ -98,7 +99,7 @@ public class RobotContainer {
     }
 
     public void stateMachinePeriodic() {
-        if(!input.get() && breakBeamDelay > 0.2){
+        if (!input.get() && breakBeamDelay > 0.2) {
             breakBeamDelay = 0.0;
             ballCount++;
         }
@@ -124,7 +125,7 @@ public class RobotContainer {
                 break;
         }
 
-        breakBeamDelay =+ 0.02;
+        breakBeamDelay = +0.02;
     }
 
     public Command getAutonomousCommand() {
