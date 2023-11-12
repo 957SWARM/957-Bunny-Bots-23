@@ -17,14 +17,6 @@ public class TransferSubsystem extends SubsystemBase {
         isEnabled = false;
     }
 
-    public void periodic() {
-        // TODO: define periodic behavior of the subsystem.
-    }
-
-    public void simulationPeriodic() {
-        // TODO: define periodic behavior of the subsystem in a simulation.
-    }
-
     public void on() {
         motor.set(ControlMode.PercentOutput, TransferConstants.TRANSFER_PERCENT_POWER);
     }

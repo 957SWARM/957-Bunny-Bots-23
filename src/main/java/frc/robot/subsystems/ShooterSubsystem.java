@@ -26,14 +26,11 @@ import frc.robot.Constants.ShooterConstants;
 public class ShooterSubsystem extends SubsystemBase {
 
     private final CANSparkMax motor;
-    private final BangBangController bb;
     private final Encoder encoder;
     private ExponentialMovingAverage average;
 
     public ShooterSubsystem() {
         motor = new CANSparkMax(ShooterConstants.CAN_ID, MotorType.kBrushless);
-
-        bb = new BangBangController(ShooterConstants.BB_TOL);
 
         encoder =
                 new Encoder(

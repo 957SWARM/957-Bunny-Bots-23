@@ -15,4 +15,12 @@ public interface DriverInput {
     public double swerveRot();
 
     public Trigger toggleGrabber();
+
+    public boolean eject();
+
+    public boolean shoot();
+
+    public boolean cancel();
+
+    public boolean intake();
 }
