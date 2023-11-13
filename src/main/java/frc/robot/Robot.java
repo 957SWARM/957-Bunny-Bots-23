@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.team957.lib.telemetry.BaseHardwareLogger;
+import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -28,6 +30,11 @@ public class Robot extends TimedRobot {
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+
+        HighLevelLogger.getInstance().startLogging();
+        HighLevelLogger.getInstance().autoGenerateLogs("highLevel", "base");
+
+        BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
     }
 
     /**
@@ -45,6 +52,9 @@ public class Robot extends TimedRobot {
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
         m_robotContainer.stateMachinePeriodic();
+
+        HighLevelLogger.getInstance().updateLogs();
+        BaseHardwareLogger.getInstance().updateLogs();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
