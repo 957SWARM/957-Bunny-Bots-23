@@ -28,6 +28,8 @@ public class TransferControlCommand extends CommandBase {
     }
 
     public void execute() {
+        // TODO: isn't this out of the scope of this command? Ideally all the control logic is done
+        // in some higher-level command, and this just recieves a boolean or (fwd/rev/stop)
         double difference =
                 Math.abs(targetShooterRPM.getAsDouble() - currentShooterRPM.getAsDouble());
         // if the transfer should be on and the shooter is running at correct speed, turn on
