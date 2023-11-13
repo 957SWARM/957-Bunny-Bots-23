@@ -5,7 +5,7 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class DefaultDriver implements DriverInput {
 
-    CommandXboxController xboxController;
+    private final CommandXboxController xboxController;
 
     public DefaultDriver(int port) {
 

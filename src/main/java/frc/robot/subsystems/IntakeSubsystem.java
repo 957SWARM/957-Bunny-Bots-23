@@ -23,8 +23,8 @@ import frc.robot.Constants.IntakeConstants;
 public class IntakeSubsystem extends SubsystemBase {
 
     // TODO: add subsystem dependencies
-    TalonSRX motor;
-    DigitalInput input = new DigitalInput(0);
+    private final TalonSRX motor;
+    private final DigitalInput input = new DigitalInput(0);
 
     public IntakeSubsystem() {
         // TODO: implement the constructor.

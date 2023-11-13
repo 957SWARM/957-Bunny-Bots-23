@@ -34,8 +34,8 @@ import java.util.List;
 public class RobotContainer {
 
     // Controllers
-    DriverInput driver = new DefaultDriver(0);
-    OperatorInput operator = new DefaultOperator(1);
+    private final DriverInput driver = new DefaultDriver(0);
+    private final OperatorInput operator = new DefaultOperator(1);
 
     // Subsystems
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -126,6 +126,11 @@ public class RobotContainer {
         }
 
         breakBeamDelay = +0.02;
+        // TODO is this intended to always set the delay to 0.02?
+        // impl for just incrementing delay is commented out here
+
+        // breakBeamDelay += dtUtil.getTimeSecondsSinceLastCall();
+        // (dtutil defined on construction)
     }
 
     public Command getAutonomousCommand() {

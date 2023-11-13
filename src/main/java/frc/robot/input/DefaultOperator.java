@@ -4,7 +4,7 @@ import edu.wpi.first.wpilibj.XboxController;
 
 public class DefaultOperator implements OperatorInput {
 
-    XboxController xboxController;
+    private final XboxController xboxController;
 
     public DefaultOperator(int port) {
         xboxController = new XboxController(0);
