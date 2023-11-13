@@ -4,6 +4,7 @@ import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.IntakeConstants;
 
 /*
@@ -24,15 +25,17 @@ public class IntakeSubsystem extends SubsystemBase {
 
     // TODO: add subsystem dependencies
     private final TalonSRX motor;
-    private final DigitalInput input = new DigitalInput(0);
+    private final DigitalInput input =
+            new DigitalInput(Constants.IntakeConstants.BREAKBEAM_DIO_PORT);
 
     public IntakeSubsystem() {
-        // TODO: implement the constructor.
         motor = new TalonSRX(IntakeConstants.CAN_ID);
     }
 
     public boolean isBeamBroken() {
-        return !input.get();
+        return (Constants.IntakeConstants.BREAKBEAM_TRUE_WHEN_OCCLUDED)
+                ? input.get()
+                : !input.get();
     }
 
     public void periodic() {
@@ -44,6 +47,6 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void setVoltage(double voltage) {
-        motor.set(ControlMode.PercentOutput, voltage / IntakeConstants.MAX_RUNNING_VOLTAGE);
+        motor.set(ControlMode.PercentOutput, voltage / motor.getBusVoltage());
     }
 }

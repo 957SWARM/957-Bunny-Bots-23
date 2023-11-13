@@ -144,9 +144,11 @@ public class Constants {
         public static final double CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
         public static final double HIGH_CURRENT_THRESHOLD_AMPS = 10;
 
-        public static final double MAX_RUNNING_VOLTAGE = 12;
         public static final double RUNNING_VOLTAGE = 9;
         public static final int CAN_ID = 0;
+
+        public static final int BREAKBEAM_DIO_PORT = 0;
+        public static final boolean BREAKBEAM_TRUE_WHEN_OCCLUDED = true;
     }
 
     public static final class TransferConstants {

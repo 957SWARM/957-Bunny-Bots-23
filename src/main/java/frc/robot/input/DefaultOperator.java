@@ -7,7 +7,7 @@ public class DefaultOperator implements OperatorInput {
     private final XboxController xboxController;
 
     public DefaultOperator(int port) {
-        xboxController = new XboxController(0);
+        xboxController = new XboxController(port);
     }
 
     public boolean limelightAutoShot() {
