@@ -7,12 +7,12 @@ import frc.robot.subsystems.ShooterSubsystem;
 import java.util.function.DoubleSupplier;
 
 // Shooter Command
-public class FlywheelControlCommand extends CommandBase {
+public class ShooterControlCommand extends CommandBase {
     private final ShooterSubsystem shooter;
     private final DoubleSupplier targetRPM;
     private final BangBangController bb;
 
-    public FlywheelControlCommand(ShooterSubsystem shooter, DoubleSupplier targetRPM) {
+    public ShooterControlCommand(ShooterSubsystem shooter, DoubleSupplier targetRPM) {
         this.shooter = shooter;
         this.targetRPM = targetRPM;
         bb = new BangBangController();

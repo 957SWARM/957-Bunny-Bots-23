@@ -4,6 +4,10 @@
 
 package frc.robot;
 
+import java.util.List;
+
+import com.team957.lib.util.DeltaTimeUtil;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
@@ -13,23 +17,27 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
-import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants.AutoConstants;
+import frc.robot.Constants.BallPathConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.IntakeControlCommand;
+import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
+import frc.robot.microsystems.IntakeStates;
 import frc.robot.microsystems.RobotState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
-import java.util.List;
 
 public class RobotContainer {
 
@@ -39,27 +47,37 @@ public class RobotContainer {
 
     // Subsystems
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    // private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+    private final ShooterSubsystem m_shooter = new ShooterSubsystem();
     private final BunnyGrabberSubsystem m_grabber = new BunnyGrabberSubsystem();
     private final TransferSubsystem m_transfer = new TransferSubsystem();
+    private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
-    public double currentFlywheelRPM = 0;
-    public double targetFlywheelRPM = 0;
-    public boolean enableIntake = false;
+    public double currentShooterRPM = 0;
+    public double targetShooterRPM = 0;
+    public IntakeStates intakeState = IntakeStates.IDLE;
     public boolean enableTransfer = false;
 
     // Ball Intake
-    DigitalInput input;
     int ballCount = 0;
-    double breakBeamDelay = 0.0;
+    DeltaTimeUtil dtUtilBreakBeam;
+    double breakBeamDelay = 0;
+
+    // Shooter
+    DeltaTimeUtil dtUtilShooterCurrent;
+    DeltaTimeUtil dtUtilShooterWait;    //  allows final ball to be shot before robot becomes idle
+    double shooterCurrentDelay = 0;
+    double shooterWaitDelay = 0;
 
     /*
      * RobotContainer Constructor.
      * Sets up default commands and calls configureBindings()
      */
     public RobotContainer() {
+        // timer object
+        dtUtilBreakBeam = new DeltaTimeUtil();
+        dtUtilShooterCurrent = new DeltaTimeUtil();
 
         // Configure default commands
         m_robotDrive.setDefaultCommand(
@@ -77,17 +95,28 @@ public class RobotContainer {
                         m_robotDrive));
 
         // m_shooter.setDefaultCommand(new FlywheelControlCommand(m_shooter, () ->
-        // targetFlywheelRPM));
+        // targetShooterRPM));
 
         m_transfer.setDefaultCommand(
                 new TransferControlCommand(
                         m_transfer,
                         () -> enableTransfer,
-                        () -> currentFlywheelRPM,
-                        () -> targetFlywheelRPM));
-
+                        () -> currentShooterRPM,
+                        () -> targetShooterRPM));
         // Configure the trigger bindings
         configureBindings();
+
+        m_intake.setDefaultCommand(
+            new IntakeControlCommand(
+                m_intake, 
+                () -> intakeState.voltage())
+        );
+
+        m_shooter.setDefaultCommand(
+            new ShooterControlCommand(
+                m_shooter, 
+                () -> targetShooterRPM)
+        );
     }
 
     /*
@@ -99,38 +128,56 @@ public class RobotContainer {
     }
 
     public void stateMachinePeriodic() {
-        if (!input.get() && breakBeamDelay > 0.2) {
+    
+        if (m_intake.isBeamBroken() && breakBeamDelay > 0.2) {
             breakBeamDelay = 0.0;
             ballCount++;
         }
 
+        // switch cases out of switch statement
         switch (ballPathState) {
             case IDLE:
-                // TODO: finish state machine
-                // TODO: add logic to move between states
+
+                // transfer off, shooter off, intake off
+                enableTransfer = false;
+                intakeState = IntakeStates.IDLE;
+                targetShooterRPM = 0;
                 break;
             case EJECT:
-                // TODO: finish state machine
-                // TODO: add logic to move between states
+
+                // transfer off, shooter off, intake eject
+                enableTransfer = false;
+                intakeState = IntakeStates.EJECT;
+                targetShooterRPM = 0;
                 break;
             case INTAKE:
-                // TODO: finish state machine
-                // TODO: add logic to move between states
+
+                // transfer off, shooter off, intake on
+                enableTransfer = false;
+                intakeState = IntakeStates.INTAKE;
+                targetShooterRPM = 0;
                 break;
             case SHOOT:
-                // TODO: finish state machine
-                // TODO: add logic to move between states
+
+                // transfer on, shooter on, intake off
+                enableTransfer = true;
+                intakeState = IntakeStates.IDLE;
+                targetShooterRPM = Constants.ShooterConstants.shooterSpeedRPM;
                 break;
             default:
                 break;
         }
 
-        breakBeamDelay = +0.02;
-        // TODO is this intended to always set the delay to 0.02?
-        // impl for just incrementing delay is commented out here
+        // Code for switching cases
+        if(ballCount > BallPathConstants.MAX_BALL_COUNT){
+            ballPathState = RobotState.EJECT;
+        }
+        else if(ballPathState == RobotState.SHOOT && ballCount == 0){
+            // Need to figure out how to add a delay of .5seconds so that robot can shoot final ball before turning idle
+            ballPathState = RobotState.IDLE;
+        }
 
-        // breakBeamDelay += dtUtil.getTimeSecondsSinceLastCall();
-        // (dtutil defined on construction)
+        breakBeamDelay = dtUtilBreakBeam.getTimeSecondsSinceLastCall();
     }
 
     public Command getAutonomousCommand() {

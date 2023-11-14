@@ -30,6 +30,7 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem() {
         motor = new TalonSRX(IntakeConstants.CAN_ID);
+
     }
 
     public boolean isBeamBroken() {
@@ -49,4 +50,6 @@ public class IntakeSubsystem extends SubsystemBase {
     public void setVoltage(double voltage) {
         motor.set(ControlMode.PercentOutput, voltage / motor.getBusVoltage());
     }
+
+    
 }

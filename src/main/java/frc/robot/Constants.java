@@ -131,6 +131,10 @@ public class Constants {
         public static final double kFreeSpeedRpm = 5676;
     }
 
+    public static final class BallPathConstants {
+        public static final int MAX_BALL_COUNT = 5;
+    }
+
     public static final class ShooterConstants {
         public static final double BB_TOL = 0;
         public static final int ENC_A = 0;
@@ -138,6 +142,7 @@ public class Constants {
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 0;
         public static final double RUNNING_VOLTAGE = 11;
+        public static final int shooterSpeedRPM = 3000;
     }
 
     public static final class IntakeConstants {
