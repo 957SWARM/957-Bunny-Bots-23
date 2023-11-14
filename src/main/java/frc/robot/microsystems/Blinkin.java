@@ -13,7 +13,7 @@ public class Blinkin {
         motor = new Spark(Channel);
     }
 
-    // No balls?
+    // No balls
     public void green() {
 
         motor.set(0.73);

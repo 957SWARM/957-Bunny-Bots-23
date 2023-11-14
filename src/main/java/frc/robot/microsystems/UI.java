@@ -1,6 +1,9 @@
 package frc.robot.microsystems;
 
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 
 public final class UI {
 
@@ -10,10 +13,14 @@ public final class UI {
     int speedY = 0;
     int speedMagnitude = 0;
     boolean bunnyGrabber;
+    SendableChooser<Command> m_chooser;
     
     private static UI INSTANCE;
 
-    private UI(){}
+    private UI(){
+        m_chooser = new SendableChooser<>();
+        m_chooser.setDefaultOption("No Auto?", new InstantCommand());
+    }
 
     public static UI getInstance(){
         if(INSTANCE == null){
@@ -29,7 +36,8 @@ public final class UI {
         SmartDashboard.putNumber("Robot Speed X", speedX);
         SmartDashboard.putNumber("Robot Speed Y", speedY);
         SmartDashboard.putNumber("Robot Speed Magnitude", speedMagnitude);
-        SmartDashboard.putString("State of Bunny Grabber", grabberState(bunnyGrabber));
+        SmartDashboard.putBoolean("State of Bunny Grabber", bunnyGrabber);
+        SmartDashboard.putData("Auto Selector", m_chooser);
     }
 
     public void setBallCount(int ballCount){
@@ -46,13 +54,16 @@ public final class UI {
         this.speedMagnitude = speedMagnitude;
     }
     
-    public String grabberState(boolean bunnyGrabber){
+    public void grabberState(boolean bunnyGrabber){
+        bunnyGrabber = false;
+        this.bunnyGrabber = bunnyGrabber;
+    }
 
-        if(bunnyGrabber = true){
-            return "Extended";
-        }
-        else{
-            return "Retracted";
-        }
+    public Command getAutonomousCommand() {
+        return m_chooser.getSelected();
+    }
+    
+    public void setAutonomousCommand(String name, Command autoCommand) {
+        m_chooser.addOption(name, autoCommand);
     }
 }
