@@ -8,7 +8,7 @@ import frc.robot.Constants.BlinkinConstants;
 
 public class Blinkin {
 
-    Spark motor;
+    private final Spark motor;
 
     public Blinkin(int Channel) {
 
