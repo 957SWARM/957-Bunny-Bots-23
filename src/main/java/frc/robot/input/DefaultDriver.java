@@ -8,7 +8,6 @@ public class DefaultDriver implements DriverInput {
     XboxController xboxController;
 
     public DefaultDriver(int port) {
-
         xboxController = new XboxController(0);
     }
 

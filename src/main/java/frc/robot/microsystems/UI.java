@@ -4,6 +4,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import frc.robot.input.DefaultDriver;
+import frc.robot.input.DefaultOperator;
+import frc.utils.DriverInput;
+import frc.utils.OperatorInput;
 
 public final class UI {
 
@@ -13,13 +17,21 @@ public final class UI {
     int speedY = 0;
     int speedMagnitude = 0;
     boolean bunnyGrabber;
-    SendableChooser<Command> m_chooser;
+    SendableChooser<Command> autoChooser;
+    SendableChooser<DriverInput> driverChooser;
+    SendableChooser<OperatorInput> operatorChooser;
     
     private static UI INSTANCE;
 
     private UI(){
-        m_chooser = new SendableChooser<>();
-        m_chooser.setDefaultOption("No Auto?", new InstantCommand());
+        autoChooser = new SendableChooser<>();
+        autoChooser.setDefaultOption("No Auto?", new InstantCommand());
+
+        driverChooser = new SendableChooser<>();
+        driverChooser.setDefaultOption("Default Driver", new DefaultDriver(ballCount));
+
+        operatorChooser = new SendableChooser<>();
+        operatorChooser.setDefaultOption("Default Operator", new DefaultOperator(ballCount));
     }
 
     public static UI getInstance(){
@@ -33,11 +45,11 @@ public final class UI {
     public void periodic(){
         SmartDashboard.putNumber("# of Balls", ballCount);
         SmartDashboard.putNumber("Shooter Speed", shooterSpeed);
-        SmartDashboard.putNumber("Robot Speed X", speedX);
-        SmartDashboard.putNumber("Robot Speed Y", speedY);
-        SmartDashboard.putNumber("Robot Speed Magnitude", speedMagnitude);
-        SmartDashboard.putBoolean("State of Bunny Grabber", bunnyGrabber);
-        SmartDashboard.putData("Auto Selector", m_chooser);
+        SmartDashboard.putNumber("Speed X", speedX);
+        SmartDashboard.putNumber("Speed Y", speedY);
+        SmartDashboard.putNumber("Speed Magnitude", speedMagnitude);
+        SmartDashboard.putBoolean("Bunny Grabber State", bunnyGrabber);
+        SmartDashboard.putData("Auto Selector", autoChooser);
     }
 
     public void setBallCount(int ballCount){
@@ -48,22 +60,27 @@ public final class UI {
         this.shooterSpeed = shooterSpeed;
     }
 
-    public void setRobotSpeed(int speedX, int speedY, int speedMagnitude){
+    public void setRobotSpeedX(int speedX){
         this.speedX = speedX;
+    }
+
+    public void setRobotSpeedY(int speedY){
         this.speedY = speedY;
-        this.speedMagnitude = speedMagnitude;
     }
     
+    public void setRobotSpeedMagnitude(int speedMagnitude){
+        this.speedMagnitude = speedMagnitude;
+    }
+
     public void grabberState(boolean bunnyGrabber){
-        bunnyGrabber = false;
         this.bunnyGrabber = bunnyGrabber;
     }
 
     public Command getAutonomousCommand() {
-        return m_chooser.getSelected();
+        return autoChooser.getSelected();
     }
     
     public void setAutonomousCommand(String name, Command autoCommand) {
-        m_chooser.addOption(name, autoCommand);
+        autoChooser.addOption(name, autoCommand);
     }
 }
