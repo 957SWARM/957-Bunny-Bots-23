@@ -15,35 +15,35 @@ public class Constants {
 
         public static final double WHEEL_MAX_SPEED_METERS_PER_SECOND = 3;
 
-        public static final Translation2d FRONT_LEFT_TRANSFORM = new Translation2d(-1, 1);
-        public static final Translation2d FRONT_RIGHT_TRANSFORM = new Translation2d(1, 1);
-        public static final Translation2d BACK_RIGHT_TRANSFORM = new Translation2d(1, -1);
-        public static final Translation2d BACK_LEFT_TRANSFORM = new Translation2d(-1, -1);
+        public static final Translation2d FRONT_LEFT_TRANSFORM = new Translation2d(-0.325, 0.325);
+        public static final Translation2d FRONT_RIGHT_TRANSFORM = new Translation2d(0.325, 0.325);
+        public static final Translation2d BACK_RIGHT_TRANSFORM = new Translation2d(0.325, -0.325);
+        public static final Translation2d BACK_LEFT_TRANSFORM = new Translation2d(-0.325, -0.325);
 
-        public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(1, 0, 0);
-        public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(1, 0, 0);
+        public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(2.5, 0, 0);
+        public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(5, 0, 0);
 
         public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
         public static final int STEER_CURRENT_LIMIT_AMPS = 20;
 
-        public static final int FRONT_LEFT_DRIVE_CANID = 11;
-        public static final int FRONT_LEFT_STEER_CANID = 10;
+        public static final int FRONT_LEFT_DRIVE_CANID = 3;
+        public static final int FRONT_LEFT_STEER_CANID = 4;
 
-        public static final int FRONT_RIGHT_DRIVE_CANID = 15;
-        public static final int FRONT_RIGHT_STEER_CANID = 14;
+        public static final int FRONT_RIGHT_DRIVE_CANID = 1;
+        public static final int FRONT_RIGHT_STEER_CANID = 2;
 
-        public static final int BACK_RIGHT_DRIVE_CANID = 17;
-        public static final int BACK_RIGHT_STEER_CANID = 16;
+        public static final int BACK_RIGHT_DRIVE_CANID = 7;
+        public static final int BACK_RIGHT_STEER_CANID = 8;
 
-        public static final int BACK_LEFT_DRIVE_CANID = 13;
-        public static final int BACK_LEFT_STEER_CANID = 12;
+        public static final int BACK_LEFT_DRIVE_CANID = 5;
+        public static final int BACK_LEFT_STEER_CANID = 6;
 
         // the offset is the "raw" value reported when the module is at the "zero" position
 
         // last updated: NOT REAL VALUES
-        public static final double FRONT_LEFT_OFFSET_RADIANS = 0;
+        public static final double FRONT_LEFT_OFFSET_RADIANS = -(Math.PI / 2);
         public static final double FRONT_RIGHT_OFFSET_RADIANS = 0;
-        public static final double BACK_RIGHT_OFFSET_RADIANS = 0;
+        public static final double BACK_RIGHT_OFFSET_RADIANS = -(Math.PI / 2);
         public static final double BACK_LEFT_OFFSET_RADIANS = 0;
 
         public static final boolean DEFAULT_BRAKE_MODE_ENABLED = false;
@@ -80,7 +80,7 @@ public class Constants {
     public static final class ShooterConstants {
         public static final double BB_TOL = 0;
         public static final int ENC_A = 0;
-        public static final int ENC_B = 0;
+        public static final int ENC_B = 1;
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 0;
         public static final double RUNNING_VOLTAGE = 11;

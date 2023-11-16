@@ -6,9 +6,14 @@ package frc.robot;
 
 import com.team957.lib.telemetry.BaseHardwareLogger;
 import com.team957.lib.telemetry.HighLevelLogger;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.drivetrain.ModuleControlCommand;
+import frc.robot.commands.drivetrain.ModuleControlCommand.CombinedModuleSetpoints;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -20,6 +25,8 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private RobotContainer m_robotContainer;
+
+    private final DriveSubsystem swerve = new DriveSubsystem();
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -90,6 +97,17 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+
+        CommandScheduler.getInstance()
+                .schedule(
+                        new ModuleControlCommand(
+                                swerve,
+                                () ->
+                                        new CombinedModuleSetpoints(
+                                                new SwerveModuleState(1, new Rotation2d()),
+                                                new SwerveModuleState(1, new Rotation2d()),
+                                                new SwerveModuleState(1, new Rotation2d()),
+                                                new SwerveModuleState(1, new Rotation2d()))));
     }
 
     /** This function is called periodically during operator control. */

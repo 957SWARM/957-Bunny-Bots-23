@@ -12,7 +12,7 @@ import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.microsystems.RobotState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
 
 public class RobotContainer {
@@ -22,8 +22,7 @@ public class RobotContainer {
     OperatorInput operator = new DefaultOperator(1);
 
     // Subsystems
-    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    // private final ShooterSubsystem m_shooter = new ShooterSubsystem();
+    private final ShooterSubsystem m_shooter = new ShooterSubsystem();
     private final BunnyGrabberSubsystem m_grabber = new BunnyGrabberSubsystem();
     private final TransferSubsystem m_transfer = new TransferSubsystem();
 
@@ -45,7 +44,11 @@ public class RobotContainer {
      */
     public RobotContainer() {
 
+        // m_shooter.setDefaultCommand(new FlywheelControlCommand(m_shooter, () ->
+        // targetFlywheelRPM));
+
         // Configure the trigger bindings
+
         configureBindings();
     }
 
