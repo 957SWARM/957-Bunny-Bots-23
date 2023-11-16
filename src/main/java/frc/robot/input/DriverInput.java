@@ -16,11 +16,11 @@ public interface DriverInput {
 
     public Trigger toggleGrabber();
 
-    public boolean eject();
+    public Trigger eject();
 
-    public boolean shoot();
+    public Trigger shoot();
 
-    public boolean cancel();
+    public Trigger cancel();
 
-    public boolean intake();
+    public Trigger intake();
 }

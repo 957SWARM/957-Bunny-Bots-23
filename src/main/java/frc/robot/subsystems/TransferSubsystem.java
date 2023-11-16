@@ -12,6 +12,10 @@ public class TransferSubsystem extends SubsystemBase {
 
     public TransferSubsystem() {
         motor = new TalonSRX(TransferConstants.CAN_ID);
+        // Reset motor factory defaults and sets limits
+        motor.configFactoryDefault();
+        // motor.configVoltageCompSaturation(TransferConstants.VOLTAGE_LIMIT);
+        motor.configPeakCurrentLimit(TransferConstants.CURRENT_LIMIT);
 
         // Default behavior
         isEnabled = false;

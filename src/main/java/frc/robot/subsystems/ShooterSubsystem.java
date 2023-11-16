@@ -37,14 +37,15 @@ public class ShooterSubsystem extends SubsystemBase {
 
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kCoast);
+        motor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT);
     }
 
     public double getRPM() {
         return (encoder.getRate() / 2048.0) / 4.0;
     }
 
-    public boolean aboveThreshold(double average, double threshold) {
-        return average > threshold;
+    public boolean aboveThreshold(double threshold) {
+        return average.getCurrentOutput() > threshold;
     }
 
     public void periodic() {

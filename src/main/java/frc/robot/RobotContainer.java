@@ -18,12 +18,15 @@ import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.trajectory.TrajectoryConfig;
 import edu.wpi.first.math.trajectory.TrajectoryGenerator;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.BallPathConstants;
+import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
@@ -31,6 +34,7 @@ import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
+import frc.robot.microsystems.Blinkin;
 import frc.robot.microsystems.IntakeStates;
 import frc.robot.microsystems.RobotState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
@@ -52,6 +56,9 @@ public class RobotContainer {
     private final TransferSubsystem m_transfer = new TransferSubsystem();
     private final IntakeSubsystem m_intake = new IntakeSubsystem();
 
+    //Microsystems
+    private final Blinkin m_blinkin = new Blinkin(BlinkinConstants.BLINKIN_CHANNEL);
+
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
     public double currentShooterRPM = 0;
@@ -69,6 +76,7 @@ public class RobotContainer {
     DeltaTimeUtil dtUtilShooterWait;    //  allows final ball to be shot before robot becomes idle
     double shooterCurrentDelay = 0;
     double shooterWaitDelay = 0;
+    boolean ballLeft = false;
 
     /*
      * RobotContainer Constructor.
@@ -125,6 +133,11 @@ public class RobotContainer {
      */
     private void configureBindings() {
         driver.toggleGrabber().onTrue(m_grabber.toggleBunnyGrabber());
+        driver.cancel().onTrue(Commands.runOnce(() -> ballPathState = RobotState.IDLE));
+        driver.shoot().onTrue(Commands.runOnce(() -> ballPathState = RobotState.SHOOT));
+        driver.intake().onTrue(Commands.runOnce(() -> ballPathState = RobotState.INTAKE));
+        driver.eject().onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
+        
     }
 
     public void stateMachinePeriodic() {
@@ -132,6 +145,15 @@ public class RobotContainer {
         if (m_intake.isBeamBroken() && breakBeamDelay > 0.2) {
             breakBeamDelay = 0.0;
             ballCount++;
+        }
+
+        //Code for shooter ball leaving detection
+        if(m_shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD) && !ballLeft){
+            ballCount--;
+            ballLeft = true;
+        }
+        if(!m_shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD)){
+            ballLeft = false;
         }
 
         // switch cases out of switch statement
@@ -162,7 +184,7 @@ public class RobotContainer {
                 // transfer on, shooter on, intake off
                 enableTransfer = true;
                 intakeState = IntakeStates.IDLE;
-                targetShooterRPM = Constants.ShooterConstants.shooterSpeedRPM;
+                targetShooterRPM = ShooterConstants.SPEED_RPM;
                 break;
             default:
                 break;
@@ -174,10 +196,30 @@ public class RobotContainer {
         }
         else if(ballPathState == RobotState.SHOOT && ballCount == 0){
             // Need to figure out how to add a delay of .5seconds so that robot can shoot final ball before turning idle
-            ballPathState = RobotState.IDLE;
+            shooterWaitDelay += dtUtilShooterWait.getTimeSecondsSinceLastCall();
+            if (shooterWaitDelay > ShooterConstants.WAIT_DURATION) {
+                ballPathState = RobotState.IDLE;
+                shooterWaitDelay = 0;
+            }
         }
 
-        breakBeamDelay = dtUtilBreakBeam.getTimeSecondsSinceLastCall();
+        //Code for switching Blinkin
+        if(ballCount == 0){
+            m_blinkin.green();
+        }
+        else if(ballCount <= 2){
+            m_blinkin.gold();
+        }
+        else if(ballCount <= 4){
+            m_blinkin.redOrange();
+        }
+        else if(ballCount == 5){
+            m_blinkin.red();
+        }
+
+        breakBeamDelay += dtUtilBreakBeam.getTimeSecondsSinceLastCall();
+
+
     }
 
     public Command getAutonomousCommand() {

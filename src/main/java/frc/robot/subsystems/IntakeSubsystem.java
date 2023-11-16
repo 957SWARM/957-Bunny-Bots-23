@@ -30,7 +30,9 @@ public class IntakeSubsystem extends SubsystemBase {
 
     public IntakeSubsystem() {
         motor = new TalonSRX(IntakeConstants.CAN_ID);
-
+        motor.configFactoryDefault();
+        // motor.configVoltageCompSaturation(IntakeConstants.VOLTAGE_LIMIT);
+        motor.configPeakCurrentLimit(IntakeConstants.CURRENT_LIMIT);
     }
 
     public boolean isBeamBroken() {

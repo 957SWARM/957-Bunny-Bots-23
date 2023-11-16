@@ -37,22 +37,22 @@ public class DefaultDriver implements DriverInput {
     }
 
     public Trigger toggleGrabber() {
+        return xboxController.leftBumper();
+    }
+
+    public Trigger cancel() {
+        return xboxController.y();
+    }
+
+    public Trigger shoot() {
+        return xboxController.b();
+    }
+
+    public Trigger eject() {
+        return xboxController.x();
+    }
+
+    public Trigger intake() {
         return xboxController.a();
-    }
-
-    public boolean cancel() {
-        return xboxController.back().getAsBoolean();
-    }
-
-    public boolean shoot() {
-        return xboxController.back().getAsBoolean();
-    }
-
-    public boolean eject() {
-        return xboxController.back().getAsBoolean();
-    }
-
-    public boolean intake() {
-        return xboxController.back().getAsBoolean();
     }
 }

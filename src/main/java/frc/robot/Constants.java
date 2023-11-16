@@ -142,12 +142,18 @@ public class Constants {
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 0;
         public static final double RUNNING_VOLTAGE = 11;
-        public static final int shooterSpeedRPM = 3000;
+        public static final int SPEED_RPM = 3000;
+        public static final double WAIT_DURATION = 0.5;
+        public static final int DETECTION_THRESHOLD = 55;
+        public static final int CURRENT_LIMIT = 10;
     }
 
     public static final class IntakeConstants {
         public static final double CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
         public static final double HIGH_CURRENT_THRESHOLD_AMPS = 10;
+
+        public static final int CURRENT_LIMIT = 40;
+        public static final int VOLTAGE_LIMIT = 11;
 
         public static final double RUNNING_VOLTAGE = 9;
         public static final int CAN_ID = 0;
@@ -163,6 +169,8 @@ public class Constants {
         public static final double kd = 0;
         public static final int RPM_TOLERANCE = 20;
         public static final double TRANSFER_PERCENT_POWER = .6;
+        public static final int CURRENT_LIMIT = 40;
+        public static final int VOLTAGE_LIMIT = 11;
     }
 
     public static final class BunnyGrabberConstants {
@@ -172,6 +180,8 @@ public class Constants {
     }
 
     public static final class BlinkinConstants {
+        // Channel needs to be set
+        public static final int BLINKIN_CHANNEL = 0;
         public static final double GREEN = 0.73;
         public static final double RED = 0.61;
         public static final double GOLD = 0.67;
