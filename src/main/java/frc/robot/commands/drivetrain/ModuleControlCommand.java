@@ -38,10 +38,10 @@ public class ModuleControlCommand implements Command {
     }
 
     public static record CombinedModuleSetpoints(
-            SwerveModuleState frontRight,
             SwerveModuleState frontLeft,
-            SwerveModuleState backLeft,
-            SwerveModuleState backRight) {}
+            SwerveModuleState frontRight,
+            SwerveModuleState backRight,
+            SwerveModuleState backLeft) {}
     // this redundant record exists so that the command can be done in a single lambda, as is
     // the weird packing and unpacking of the lambda
     // doing it in multiple lambdas causes different modules to get setpoints that *slightly* clash.

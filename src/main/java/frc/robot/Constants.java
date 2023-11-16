@@ -2,6 +2,7 @@ package frc.robot;
 
 import com.team957.lib.controllers.feedback.PID.PIDConstants;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 
@@ -17,6 +18,15 @@ public class Constants {
         public static final Translation2d FRONT_RIGHT_TRANSFORM = new Translation2d(0.325, 0.325);
         public static final Translation2d BACK_RIGHT_TRANSFORM = new Translation2d(0.325, -0.325);
         public static final Translation2d BACK_LEFT_TRANSFORM = new Translation2d(-0.325, -0.325);
+
+        // ORDER OF THESE ARGUMENTS MATTERS!!!!!
+        // all calls to this kinematics object must match it
+        public static final SwerveDriveKinematics KINEMATICS =
+                new SwerveDriveKinematics(
+                        FRONT_LEFT_TRANSFORM,
+                        FRONT_RIGHT_TRANSFORM,
+                        BACK_RIGHT_TRANSFORM,
+                        BACK_LEFT_TRANSFORM);
 
         public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(2.5, 0, 0);
         public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(5, 0, 0);

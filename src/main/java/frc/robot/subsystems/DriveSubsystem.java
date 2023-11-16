@@ -12,6 +12,8 @@ import com.team957.lib.math.UtilityMath;
 import com.team957.lib.telemetry.HighLevelLogger;
 import com.team957.lib.telemetry.Logger;
 import com.team957.lib.util.GearRatioHelper;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
@@ -264,6 +266,11 @@ public class DriveSubsystem implements Subsystem {
                     * (invertDrive ? -1 : 1);
         }
 
+        public SwerveModulePosition getState() {
+            return new SwerveModulePosition(
+                    getDriveAccumulationMeters(), new Rotation2d(getSteerPositionRadians()));
+        }
+
         private void updateLogs() {
             brakeModeEnabledLogger.update();
 
@@ -286,6 +293,23 @@ public class DriveSubsystem implements Subsystem {
             driveVelocityLogger.update();
         }
     }
+
+    public record ModuleStates(
+            SwerveModulePosition frontLeft,
+            SwerveModulePosition frontRight,
+            SwerveModulePosition backRight,
+            SwerveModulePosition backLeft) {
+        /**
+         * Returns the module states in an array format. Order compatible with the Kinematics object
+         * in Constants.
+         *
+         * @return The module states as array.
+         */
+        public SwerveModulePosition[] asArray() {
+            return new SwerveModulePosition[] {frontLeft, frontRight, backRight, backLeft};
+        }
+    }
+    ;
 
     public final MaxSwerveModule frontLeft =
             new MaxSwerveModule(
@@ -329,5 +353,13 @@ public class DriveSubsystem implements Subsystem {
         frontRight.updateLogs();
         backLeft.updateLogs();
         backRight.updateLogs();
+    }
+
+    public ModuleStates getStates() {
+        return new ModuleStates(
+                frontLeft.getState(),
+                frontRight.getState(),
+                backRight.getState(),
+                backLeft.getState());
     }
 }

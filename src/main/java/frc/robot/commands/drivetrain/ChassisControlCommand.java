@@ -10,12 +10,6 @@ import frc.robot.subsystems.DriveSubsystem;
 import java.util.function.DoubleSupplier;
 
 public class ChassisControlCommand extends ProxyCommand {
-    private static final SwerveDriveKinematics kinematics =
-            new SwerveDriveKinematics(
-                    Constants.DriveConstants.FRONT_RIGHT_TRANSFORM,
-                    Constants.DriveConstants.FRONT_LEFT_TRANSFORM,
-                    Constants.DriveConstants.BACK_LEFT_TRANSFORM,
-                    Constants.DriveConstants.BACK_RIGHT_TRANSFORM);
     /**
      * Constructs a ChassisControlCommand.
      *
@@ -34,7 +28,7 @@ public class ChassisControlCommand extends ProxyCommand {
                         drive,
                         () -> {
                             SwerveModuleState[] states =
-                                    kinematics.toSwerveModuleStates(
+                                    Constants.DriveConstants.KINEMATICS.toSwerveModuleStates(
                                             new ChassisSpeeds(
                                                     chassisRelativeXVelocity.getAsDouble(),
                                                     chassisRelativeYVelocity.getAsDouble(),
