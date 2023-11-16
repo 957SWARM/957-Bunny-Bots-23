@@ -11,8 +11,6 @@ public class Constants {
     }
 
     public static final class DriveConstants {
-        // TODO input actual numbers
-
         public static final double WHEEL_MAX_SPEED_METERS_PER_SECOND = 3;
 
         public static final Translation2d FRONT_LEFT_TRANSFORM = new Translation2d(-0.325, 0.325);
@@ -22,6 +20,10 @@ public class Constants {
 
         public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(2.5, 0, 0);
         public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(5, 0, 0);
+
+        // TODO determine feedforward gains empirically
+        public static final double DRIVE_FEEDFORWARD_KS_VOLTS = 0;
+        public static final double DRIVE_FEEDFORWARD_KV_VOLT_SECONDS_PER_METER = 0;
 
         public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
         public static final int STEER_CURRENT_LIMIT_AMPS = 20;
@@ -40,7 +42,7 @@ public class Constants {
 
         // the offset is the "raw" value reported when the module is at the "zero" position
 
-        // last updated: NOT REAL VALUES
+        // last updated: November 15 8:30 PM
         public static final double FRONT_LEFT_OFFSET_RADIANS = -(Math.PI / 2);
         public static final double FRONT_RIGHT_OFFSET_RADIANS = 0;
         public static final double BACK_RIGHT_OFFSET_RADIANS = -(Math.PI / 2);

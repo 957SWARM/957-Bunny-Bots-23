@@ -2,6 +2,7 @@ package frc.robot.commands.drivetrain;
 
 import com.team957.lib.controllers.feedback.PID;
 import com.team957.lib.util.DeltaTimeUtil;
+import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -17,15 +18,22 @@ public class ModuleControlCommand implements Command {
     private class ModuleContainer {
         final Supplier<SwerveModuleState> setpoint;
 
-        final MaxSwerveModule module;
+        final MaxSwerveModule hw;
 
-        final PID driveController = new PID(Constants.DriveConstants.DRIVE_FEEDBACK_CONSTANTS, 0);
-        final PID steerController =
+        final PID driveFeedback = new PID(Constants.DriveConstants.DRIVE_FEEDBACK_CONSTANTS, 0);
+        final SimpleMotorFeedforward driveFeedforward =
+                new SimpleMotorFeedforward(
+                        Constants.DriveConstants.DRIVE_FEEDFORWARD_KS_VOLTS,
+                        Constants.DriveConstants.DRIVE_FEEDFORWARD_KV_VOLT_SECONDS_PER_METER);
+
+        final PID steerFeedback =
                 new PID(Constants.DriveConstants.STEER_FEEDBACK_CONSTANTS, 0, true);
+        // starting with no steer feedforward, could very well be added if the turning needs to be
+        // snappier
 
         ModuleContainer(Supplier<SwerveModuleState> setpoint, MaxSwerveModule module) {
             this.setpoint = setpoint;
-            this.module = module;
+            this.hw = module;
         }
     }
 
@@ -72,21 +80,24 @@ public class ModuleControlCommand implements Command {
 
         for (ModuleContainer module :
                 new ModuleContainer[] {frontRight, frontLeft, backLeft, backRight}) {
+
             SwerveModuleState setpoint =
                     SwerveModuleState.optimize(
                             module.setpoint.get(),
-                            new Rotation2d(module.module.getSteerPositionRadians()));
+                            new Rotation2d(module.hw.getSteerPositionRadians()));
 
-            module.driveController.setSetpoint(setpoint.speedMetersPerSecond);
+            module.driveFeedback.setSetpoint(setpoint.speedMetersPerSecond);
+            module.steerFeedback.setSetpoint(setpoint.angle.getRadians());
 
-            module.steerController.setSetpoint(setpoint.angle.getRadians());
+            double driveFeedback =
+                    module.driveFeedback.calculate(module.hw.getDriveVelocityMetersPerSecond(), dt);
+            double driveFeedforward =
+                    module.driveFeedforward.calculate(setpoint.angle.getRadians());
+            module.hw.setDriveControlInput(driveFeedback + driveFeedforward);
 
-            module.module.setDriveControlInput(
-                    module.driveController.calculate(
-                            module.module.getDriveVelocityMetersPerSecond(), dt));
-
-            module.module.setSteerControlInput(
-                    module.steerController.calculate(module.module.getSteerPositionRadians(), dt));
+            double steerFeedback =
+                    module.steerFeedback.calculate(module.hw.getSteerPositionRadians(), dt);
+            module.hw.setSteerControlInput(steerFeedback);
         }
     }
 }
