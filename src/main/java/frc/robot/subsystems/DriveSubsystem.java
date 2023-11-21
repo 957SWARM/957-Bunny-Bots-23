@@ -15,6 +15,8 @@ import com.team957.lib.util.GearRatioHelper;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
 
@@ -359,5 +361,14 @@ public class DriveSubsystem implements Subsystem {
                 frontRight.getState(),
                 backRight.getState(),
                 backLeft.getState());
+    }
+
+    public Command setBrakeModeCommand(boolean enabled) {
+        return Commands.runOnce(
+                () -> {
+                    for (MaxSwerveModule module :
+                            new MaxSwerveModule[] {frontLeft, frontRight, backRight, backLeft})
+                        module.setBrakeMode(enabled);
+                });
     }
 }

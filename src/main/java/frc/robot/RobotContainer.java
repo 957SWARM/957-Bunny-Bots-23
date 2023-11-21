@@ -133,7 +133,7 @@ public class RobotContainer {
 
         // TODO: look into removing the instance-level declaration of these
         // idk how the garbage collector treats triggers if their symbol goes out of scope
-        
+
         // CONTROL TRIGGERS
         zeroIMUTrigger =
                 new Trigger(() -> driver.zeroGyro())
