@@ -16,7 +16,7 @@ public final class UI {
     int speedX = 0;
     int speedY = 0;
     int speedMagnitude = 0;
-    boolean bunnyGrabber;
+    boolean bunnyGrabber = false;
     SendableChooser<Command> autoChooser;
     SendableChooser<DriverInput> driverChooser;
     SendableChooser<OperatorInput> operatorChooser;
@@ -28,10 +28,10 @@ public final class UI {
         autoChooser.setDefaultOption("No Auto?", new InstantCommand());
 
         driverChooser = new SendableChooser<>();
-        driverChooser.setDefaultOption("Default Driver", new DefaultDriver(ballCount));
+        driverChooser.setDefaultOption("Default Driver", new DefaultDriver(0));
 
         operatorChooser = new SendableChooser<>();
-        operatorChooser.setDefaultOption("Default Operator", new DefaultOperator(ballCount));
+        operatorChooser.setDefaultOption("Default Operator", new DefaultOperator(1));
     }
 
     public static UI getInstance() {
@@ -49,6 +49,9 @@ public final class UI {
         SmartDashboard.putNumber("Speed Magnitude", speedMagnitude);
         SmartDashboard.putBoolean("Bunny Grabber State", bunnyGrabber);
         SmartDashboard.putData("Auto Selector", autoChooser);
+        SmartDashboard.putData("Driver Selector", driverChooser);
+        SmartDashboard.putData("Operator Selector", operatorChooser);
+    
     }
 
     public void setBallCount(int ballCount) {
@@ -81,5 +84,19 @@ public final class UI {
 
     public void setAutonomousCommand(String name, Command autoCommand) {
         autoChooser.addOption(name, autoCommand);
+    }
+    public DriverInput getDriverBinding() {
+        return driverChooser.getSelected();
+    }
+
+    public void setDriverBinding(String name, DriverInput driverInput) {
+        driverChooser.addOption(name, driverInput);
+    }
+    public OperatorInput getOperatorBinding() {
+        return operatorChooser.getSelected();
+    }
+
+    public void setOperatorBinding(String name, OperatorInput operatorInput) {
+        operatorChooser.addOption(name, operatorInput);
     }
 }
