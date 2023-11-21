@@ -5,14 +5,12 @@
 package frc.robot;
 
 import com.team957.lib.util.DeltaTimeUtil;
-import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.BallPathConstants;
 import frc.robot.Constants.BlinkinConstants;
-import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.BasicVisionTargetingCommand;
 import frc.robot.commands.IntakeControlCommand;
@@ -23,6 +21,7 @@ import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.microsystems.IntakeStates;
+import frc.robot.microsystems.Limelight;
 import frc.robot.microsystems.RobotState;
 import frc.robot.microsystems.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
@@ -138,12 +137,7 @@ public class RobotContainer {
 
         visionTrigger = new Trigger(() -> driver.visionTargeting());
         visionTrigger.toggleOnTrue(
-                new BasicVisionTargetingCommand(
-                        drive,
-                        () -> -MathUtil.applyDeadband(driver.swerveY(), OIConstants.kDriveDeadband),
-                        () ->
-                                -MathUtil.applyDeadband(
-                                        driver.swerveX(), OIConstants.kDriveDeadband)));
+                new BasicVisionTargetingCommand(drive, Limelight.getInstance()::getTx));
 
         increaseBallTrigger = new Trigger(() -> driver.increaseBallCount());
         increaseBallTrigger.onTrue(Commands.runOnce(() -> ballCount++));
