@@ -131,10 +131,13 @@ public class RobotContainer {
      */
     private void configureBindings() {
 
+        // TODO: look into removing the instance-level declaration of these
+        // idk how the garbage collector treats triggers if their symbol goes out of scope
+        
         // CONTROL TRIGGERS
         zeroIMUTrigger =
                 new Trigger(() -> driver.zeroGyro())
-                        .onTrue(Commands.run(IMU.instance::setAngleToZero));
+                        .onTrue(Commands.runOnce(IMU.instance::setAngleToZero));
 
         grabberTrigger =
                 new Trigger(() -> driver.toggleGrabber()).onTrue(grabber.toggleBunnyGrabber());
