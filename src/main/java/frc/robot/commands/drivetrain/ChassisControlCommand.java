@@ -39,7 +39,7 @@ public class ChassisControlCommand extends ProxyCommand {
                                     Constants.DriveConstants.WHEEL_MAX_SPEED_METERS_PER_SECOND);
 
                             return new CombinedModuleSetpoints(
-                                    states[0], states[1], states[2], states[3]);
+                                    states[1], states[2], states[3], states[0]);
                         }));
     }
 }

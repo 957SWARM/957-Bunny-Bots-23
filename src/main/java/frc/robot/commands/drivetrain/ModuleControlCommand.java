@@ -97,7 +97,7 @@ public class ModuleControlCommand implements Command {
 
             double steerFeedback =
                     module.steerFeedback.calculate(module.hw.getSteerPositionRadians(), dt);
-            module.hw.setSteerControlInput(steerFeedback);
+            module.hw.setSteerControlInput(-steerFeedback); // negated
         }
     }
 }

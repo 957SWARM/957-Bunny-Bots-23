@@ -6,10 +6,6 @@ package frc.robot;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.input.DefaultDriver;
-import frc.robot.input.DefaultOperator;
-import frc.robot.input.DriverInput;
-import frc.robot.input.OperatorInput;
 import frc.robot.microsystems.RobotState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -18,8 +14,8 @@ import frc.robot.subsystems.TransferSubsystem;
 public class RobotContainer {
 
     // Controllers
-    DriverInput driver = new DefaultDriver(0);
-    OperatorInput operator = new DefaultOperator(1);
+    // DriverInput driver = new DefaultDriver(0);
+    // OperatorInput operator = new DefaultOperator(1);
 
     // Subsystems
     private final ShooterSubsystem m_shooter = new ShooterSubsystem();
@@ -48,7 +44,7 @@ public class RobotContainer {
         // targetFlywheelRPM));
 
         // Configure the trigger bindings
-
+        
         configureBindings();
     }
 
@@ -57,14 +53,15 @@ public class RobotContainer {
      * See wiki pages on Triggers for documentation.
      */
     private void configureBindings() {
-        driver.toggleGrabber().onTrue(m_grabber.toggleBunnyGrabber());
+        // driver.toggleGrabber().onTrue(m_grabber.toggleBunnyGrabber());
     }
 
     public void stateMachinePeriodic() {
-        if (!input.get() && breakBeamDelay > 0.2) {
-            breakBeamDelay = 0.0;
-            ballCount++;
-        }
+        // if (!input.get() && breakBeamDelay > 0.2) {
+        //    breakBeamDelay = 0.0;
+        //    ballCount++;
+        // }
+        // crashes in hardware
 
         switch (ballPathState) {
             case IDLE:

@@ -239,8 +239,7 @@ public class DriveSubsystem implements Subsystem {
         }
 
         public double getUnoffsetSteerPositionRadians() {
-            // TODO: remove absolute encoder scaling on all steer sparkmaxes
-            return steer.getAbsoluteEncoder(Type.kDutyCycle).getPosition() * 2 * Math.PI;
+            return steer.getAbsoluteEncoder(Type.kDutyCycle).getPosition();
         }
 
         public double getSteerPositionRadians() {

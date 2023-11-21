@@ -49,7 +49,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void periodic() {
         // TODO: define periodic behavior of the subsystem.
-        average.calculate(motor.getOutputCurrent());
+        // average.calculate(motor.getOutputCurrent());
+        // crashes on hardware
     }
 
     public void simulationPeriodic() {
