@@ -20,10 +20,10 @@ public final class UI {
     SendableChooser<Command> autoChooser;
     SendableChooser<DriverInput> driverChooser;
     SendableChooser<OperatorInput> operatorChooser;
-    
+
     private static UI INSTANCE;
 
-    private UI(){
+    private UI() {
         autoChooser = new SendableChooser<>();
         autoChooser.setDefaultOption("No Auto?", new InstantCommand());
 
@@ -34,15 +34,14 @@ public final class UI {
         operatorChooser.setDefaultOption("Default Operator", new DefaultOperator(ballCount));
     }
 
-    public static UI getInstance(){
-        if(INSTANCE == null){
+    public static UI getInstance() {
+        if (INSTANCE == null) {
             INSTANCE = new UI();
         }
         return INSTANCE;
     }
 
-
-    public void periodic(){
+    public void periodic() {
         SmartDashboard.putNumber("# of Balls", ballCount);
         SmartDashboard.putNumber("Shooter Speed", shooterSpeed);
         SmartDashboard.putNumber("Speed X", speedX);
@@ -52,34 +51,34 @@ public final class UI {
         SmartDashboard.putData("Auto Selector", autoChooser);
     }
 
-    public void setBallCount(int ballCount){
+    public void setBallCount(int ballCount) {
         this.ballCount = ballCount;
     }
 
-    public void setShooterSpeedNumber(int shooterSpeed){
+    public void setShooterSpeedNumber(int shooterSpeed) {
         this.shooterSpeed = shooterSpeed;
     }
 
-    public void setRobotSpeedX(int speedX){
+    public void setRobotSpeedX(int speedX) {
         this.speedX = speedX;
     }
 
-    public void setRobotSpeedY(int speedY){
+    public void setRobotSpeedY(int speedY) {
         this.speedY = speedY;
     }
-    
-    public void setRobotSpeedMagnitude(int speedMagnitude){
+
+    public void setRobotSpeedMagnitude(int speedMagnitude) {
         this.speedMagnitude = speedMagnitude;
     }
 
-    public void grabberState(boolean bunnyGrabber){
+    public void grabberState(boolean bunnyGrabber) {
         this.bunnyGrabber = bunnyGrabber;
     }
 
     public Command getAutonomousCommand() {
         return autoChooser.getSelected();
     }
-    
+
     public void setAutonomousCommand(String name, Command autoCommand) {
         autoChooser.addOption(name, autoCommand);
     }
