@@ -40,6 +40,7 @@ import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.microsystems.IntakeStates;
 import frc.robot.microsystems.RobotState;
+import frc.robot.microsystems.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -48,10 +49,8 @@ import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
 
 public class RobotContainer {
-
-    // Controllers
-    private final DriverInput driver = new DefaultDriver(0);
-    private final OperatorInput operator = new DefaultOperator(1);
+    private DriverInput driver = UI.getInstance().getDriverBinding();
+    private OperatorInput operator = UI.getInstance().getOperatorBinding();
 
     // Subsystems
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
@@ -263,6 +262,8 @@ public class RobotContainer {
             }
         }
 
+        // pushes ball count to dashboard
+        UI.getInstance().setBallCount(ballCount);
     }
 
     public Command getAutonomousCommand() {
@@ -312,5 +313,11 @@ public class RobotContainer {
 
         // Run path following command, then stop at the end.
         return swerveControllerCommand.andThen(() -> m_robotDrive.drive(0, 0, 0, false, false));
+    }
+
+    public void updateControllers(){
+         // Controllers
+        driver = UI.getInstance().getDriverBinding();
+        operator = UI.getInstance().getOperatorBinding();
     }
 }

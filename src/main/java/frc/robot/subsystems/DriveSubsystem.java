@@ -5,6 +5,7 @@
 package frc.robot.subsystems;
 
 import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
@@ -16,6 +17,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.util.WPIUtilJNI;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.microsystems.UI;
 import frc.robot.util.MAXSwerveModule;
 import frc.robot.util.SwerveUtils;
 
@@ -83,6 +85,7 @@ public class DriveSubsystem extends SubsystemBase {
                     m_rearLeft.getPosition(),
                     m_rearRight.getPosition()
                 });
+        
     }
 
     /**
@@ -205,6 +208,13 @@ public class DriveSubsystem extends SubsystemBase {
         m_frontRight.setDesiredState(swerveModuleStates[1]);
         m_rearLeft.setDesiredState(swerveModuleStates[2]);
         m_rearRight.setDesiredState(swerveModuleStates[3]);
+
+        // Send speeds to dashboard
+        UI.getInstance().setRobotSpeedX(xSpeed);
+        UI.getInstance().setRobotSpeedY(ySpeed);
+        UI.getInstance().setRobotSpeedMagnitude(
+            Math.sqrt(xSpeed*xSpeed + ySpeed*ySpeed)
+        );
     }
 
     /** Sets the wheels into an X formation to prevent movement. */

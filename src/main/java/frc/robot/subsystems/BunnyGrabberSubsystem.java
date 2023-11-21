@@ -32,4 +32,8 @@ public class BunnyGrabberSubsystem extends SubsystemBase {
     public CommandBase toggleBunnyGrabber() {
         return this.runOnce(() -> piston.toggle());
     }
+
+    public void periodic(){
+        UI.getInstance().grabberState(piston.get());
+    }
 }

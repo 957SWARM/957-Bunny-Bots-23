@@ -8,6 +8,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.microsystems.UI;
 
 /*
  * See the following wiki pages:
@@ -54,6 +55,8 @@ public class ShooterSubsystem extends SubsystemBase {
     public void periodic() {
         // TODO: define periodic behavior of the subsystem.
         filterOutput = filter.calculate(motor.getOutputCurrent());
+        
+        UI.getInstance().setShooterSpeed(encoder.getRate() / 2048 / 40);
     }
 
     public void simulationPeriodic() {
