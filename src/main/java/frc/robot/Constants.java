@@ -133,6 +133,8 @@ public class Constants {
 
     public static final class BallPathConstants {
         public static final int MAX_BALL_COUNT = 5;
+        public static final double DEBOUNCE_CURRENT_TIME = .3;
+        public static final double DEBOUNCE_SENSOR_TIME = .1;
     }
 
     public static final class ShooterConstants {
@@ -194,5 +196,13 @@ public class Constants {
         public static final double REDORANGE = 0.63;
         public static final double AUTOMATION = -0.57;
         public static final double SECOND_AUTOMATION = -0.89;
+
+        public static final int GREEN_VALUE = 0;
+        public static final int GOLD_RANGE_MIN = 1;
+        public static final int GOLD_RANGE_MAX = 2;
+        public static final int REDORANGE_RANGE_MIN = 3;
+        public static final int REDORANGE_RANGE_MAX = 4;
+        public static final int RED_RANGE_UPPERBOUND = 5;
+        public static final int RED_RANGE_LOWERBOUND = 0;
     }
 }

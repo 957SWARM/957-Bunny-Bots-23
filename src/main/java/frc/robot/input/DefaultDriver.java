@@ -23,40 +23,48 @@ public class DefaultDriver implements DriverInput {
     }
 
     @Override
-    public Trigger swerveFieldRelative() {
-        return xboxController.start();
+    public boolean swerveFieldRelative() {
+        return xboxController.start().getAsBoolean();
     }
 
     @Override
-    public Trigger zeroGyro() {
-        return xboxController.back();
+    public boolean zeroGyro() {
+        return xboxController.back().getAsBoolean();
     }
 
     public double swerveRot() {
         return xboxController.getRightX();
     }
 
-    public Trigger toggleGrabber() {
-        return xboxController.leftBumper();
+    public boolean toggleGrabber() {
+        return xboxController.leftBumper().getAsBoolean();
     }
 
-    public Trigger cancel() {
-        return xboxController.y();
+    public boolean cancel() {
+        return xboxController.y().getAsBoolean();
     }
 
-    public Trigger shoot() {
-        return xboxController.b();
+    public boolean shoot() {
+        return xboxController.b().getAsBoolean();
     }
 
-    public Trigger eject() {
-        return xboxController.x();
+    public boolean eject() {
+        return xboxController.x().getAsBoolean();
     }
 
-    public Trigger intake() {
-        return xboxController.a();
+    public boolean intake() {
+        return xboxController.a().getAsBoolean();
     }
 
-    public Trigger visionTargerting(){
-        return xboxController.b();
+    public boolean visionTargeting(){
+        return xboxController.b().getAsBoolean();
+    }
+
+    public boolean increaseBallCount(){
+        return xboxController.povUp().getAsBoolean();
+    }
+
+    public boolean decreaseBallCount(){
+        return xboxController.povDown().getAsBoolean();
     }
 }

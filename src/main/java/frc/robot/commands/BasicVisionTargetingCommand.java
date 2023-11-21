@@ -4,9 +4,9 @@ import java.util.function.DoubleSupplier;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.VisionTargetingConstants;
 import frc.robot.microsystems.Limelight;
 import frc.robot.subsystems.DriveSubsystem;
-import frc.utils.Constants.VisionTargetingConstants;;
 
 public class BasicVisionTargetingCommand extends CommandBase{
     private final Limelight limelight = Limelight.getInstance();

@@ -11,6 +11,7 @@ import com.team957.lib.util.DeltaTimeUtil;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.filter.Debouncer;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -21,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.AutoConstants;
 import frc.robot.Constants.BallPathConstants;
 import frc.robot.Constants.BlinkinConstants;
@@ -28,6 +30,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.BasicVisionTargetingCommand;
+// import frc.robot.commands.BasicVisionTargetingCommand;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
@@ -35,9 +38,9 @@ import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
-import frc.robot.microsystems.Blinkin;
 import frc.robot.microsystems.IntakeStates;
 import frc.robot.microsystems.RobotState;
+import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
@@ -56,9 +59,7 @@ public class RobotContainer {
     private final BunnyGrabberSubsystem m_grabber = new BunnyGrabberSubsystem();
     private final TransferSubsystem m_transfer = new TransferSubsystem();
     private final IntakeSubsystem m_intake = new IntakeSubsystem();
-
-    //Microsystems
-    private final Blinkin m_blinkin = new Blinkin(BlinkinConstants.BLINKIN_CHANNEL);
+    private final BlinkinSubsystem m_blinkin = new BlinkinSubsystem(BlinkinConstants.BLINKIN_CHANNEL);
 
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
@@ -78,6 +79,29 @@ public class RobotContainer {
     double shooterCurrentDelay = 0;
     double shooterWaitDelay = 0;
     boolean ballLeft = false;
+
+    // Triggers
+    // Control Triggers
+    Trigger grabberTrigger;
+    Trigger shootTrigger;
+    Trigger cancelTrigger;
+    Trigger intakeTrigger;
+    Trigger ejectTrigger;
+    Trigger visionTrigger;
+    Trigger increaseBallTrigger;
+    Trigger decreaseBallTrigger;
+    // Sensing Triggers
+    Trigger beamBrokenTrigger;
+    Trigger currentThresholdTrigger;
+    Trigger tooManyBallsTrigger;
+    // Blinkin light Triggers
+    Trigger greenTrigger;
+    Trigger redTrigger;
+    Trigger goldTrigger;
+    Trigger redOrangeTrigger;
+    Trigger automationTrigger;
+    Trigger secondAutomationTrigger;
+
 
     /*
      * RobotContainer Constructor.
@@ -133,33 +157,67 @@ public class RobotContainer {
      * See wiki pages on Triggers for documentation.
      */
     private void configureBindings() {
-        driver.toggleGrabber().onTrue(m_grabber.toggleBunnyGrabber());
-        driver.cancel().onTrue(Commands.runOnce(() -> ballPathState = RobotState.IDLE));
-        driver.shoot().onTrue(Commands.runOnce(() -> ballPathState = RobotState.SHOOT));
-        driver.intake().onTrue(Commands.runOnce(() -> ballPathState = RobotState.INTAKE));
-        driver.eject().onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
+
+        // CONTROL TRIGGERS
+        grabberTrigger = new Trigger(() -> driver.toggleGrabber());
+        grabberTrigger.onTrue(m_grabber.toggleBunnyGrabber());
+
+        cancelTrigger = new Trigger(() -> driver.cancel());
+        cancelTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.IDLE));
+
+        shootTrigger = new Trigger(() -> driver.shoot());
+        shootTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.SHOOT));
+
+        intakeTrigger = new Trigger(() -> driver.intake());
+        intakeTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.INTAKE));
+
+        ejectTrigger = new Trigger(() -> driver.intake());
+        ejectTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
+
+        visionTrigger = new Trigger(() -> driver.visionTargeting());
+        visionTrigger.toggleOnTrue(new BasicVisionTargetingCommand(
+                m_robotDrive, 
+                () -> -MathUtil.applyDeadband(driver.swerveY(), OIConstants.kDriveDeadband), 
+                () -> -MathUtil.applyDeadband(driver.swerveX(), OIConstants.kDriveDeadband)
+            )
+        );
+
+        increaseBallTrigger = new Trigger(() -> driver.increaseBallCount());
+        increaseBallTrigger.onTrue(Commands.runOnce(() -> ballCount++));
+
+        decreaseBallTrigger = new Trigger(() -> driver.decreaseBallCount());
+        decreaseBallTrigger.onTrue(Commands.runOnce(() -> ballCount--));
         
-        driver.visionTargerting().toggleOnTrue(new BasicVisionTargetingCommand(
-            m_robotDrive, 
-            () -> -MathUtil.applyDeadband(driver.swerveY(), OIConstants.kDriveDeadband), 
-            () -> -MathUtil.applyDeadband(driver.swerveX(), OIConstants.kDriveDeadband)));
+        // SENSING TRIGGERS
+        // increases ball count if breakbeam sensor detects something. Debounced to prevent rapid changes
+        beamBrokenTrigger = new Trigger(() -> m_intake.isBeamBroken());
+        beamBrokenTrigger.debounce(BallPathConstants.DEBOUNCE_SENSOR_TIME, Debouncer.DebounceType.kBoth).onTrue(
+            Commands.runOnce(() -> ballCount++)
+        );
+
+        // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
+        currentThresholdTrigger = new Trigger(() -> m_shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD));
+        currentThresholdTrigger.debounce(BallPathConstants.DEBOUNCE_CURRENT_TIME, Debouncer.DebounceType.kBoth).onTrue(
+            Commands.runOnce(() -> ballCount--)
+        );
+
+        // ejects balls if we have more than the max allowed (5)
+        tooManyBallsTrigger = new Trigger(() -> ballCount > BallPathConstants.MAX_BALL_COUNT);
+        tooManyBallsTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
+
+
+        // BLINKIN LIGHT TRIGGERS
+        greenTrigger = new Trigger(() -> ballCount == BlinkinConstants.GREEN_VALUE);
+        greenTrigger.onTrue(m_blinkin.green());
+        goldTrigger = new Trigger(() -> ballCount >= BlinkinConstants.GOLD_RANGE_MIN && ballCount <= BlinkinConstants.GOLD_RANGE_MAX);
+        goldTrigger.onTrue(m_blinkin.gold());
+        redOrangeTrigger = new Trigger(() -> ballCount >= BlinkinConstants.REDORANGE_RANGE_MIN && ballCount <= BlinkinConstants.REDORANGE_RANGE_MAX);
+        redOrangeTrigger.onTrue(m_blinkin.redOrange());
+        redTrigger = new Trigger(() -> ballCount >= BlinkinConstants.RED_RANGE_UPPERBOUND || ballCount < BlinkinConstants.RED_RANGE_LOWERBOUND);
+        redTrigger.onTrue(m_blinkin.red());
     }
 
     public void stateMachinePeriodic() {
-    
-        if (m_intake.isBeamBroken() && breakBeamDelay > 0.2) {
-            breakBeamDelay = 0.0;
-            ballCount++;
-        }
-
-        //Code for shooter ball leaving detection
-        if(m_shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD) && !ballLeft){
-            ballCount--;
-            ballLeft = true;
-        }
-        if(!m_shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD)){
-            ballLeft = false;
-        }
 
         // switch cases out of switch statement
         switch (ballPathState) {
@@ -195,11 +253,8 @@ public class RobotContainer {
                 break;
         }
 
-        // Code for switching cases
-        if(ballCount > BallPathConstants.MAX_BALL_COUNT){
-            ballPathState = RobotState.EJECT;
-        }
-        else if(ballPathState == RobotState.SHOOT && ballCount == 0){
+
+        if(ballPathState == RobotState.SHOOT && ballCount == 0){
             // Need to figure out how to add a delay of .5seconds so that robot can shoot final ball before turning idle
             shooterWaitDelay += dtUtilShooterWait.getTimeSecondsSinceLastCall();
             if (shooterWaitDelay > ShooterConstants.WAIT_DURATION) {
@@ -207,23 +262,6 @@ public class RobotContainer {
                 shooterWaitDelay = 0;
             }
         }
-
-        //Code for switching Blinkin
-        if(ballCount == 0){
-            m_blinkin.green();
-        }
-        else if(ballCount <= 2){
-            m_blinkin.gold();
-        }
-        else if(ballCount <= 4){
-            m_blinkin.redOrange();
-        }
-        else if(ballCount == 5){
-            m_blinkin.red();
-        }
-
-        breakBeamDelay += dtUtilBreakBeam.getTimeSecondsSinceLastCall();
-
 
     }
 
