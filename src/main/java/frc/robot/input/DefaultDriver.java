@@ -55,4 +55,8 @@ public class DefaultDriver implements DriverInput {
     public Trigger intake() {
         return xboxController.a();
     }
+
+    public Trigger visionTargerting(){
+        return xboxController.b();
+    }
 }

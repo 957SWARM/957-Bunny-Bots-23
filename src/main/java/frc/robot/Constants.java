@@ -173,6 +173,12 @@ public class Constants {
         public static final int VOLTAGE_LIMIT = 11;
     }
 
+    public static final class VisionTargetingConstants {
+        public static final double TARGETING_KP = 0.0;
+        public static final double TARGETING_KI = 0.0;
+        public static final double TARGETING_KD = 0.0;
+    }
+    
     public static final class BunnyGrabberConstants {
         public static final int MODULE_PORT = 14;
         public static final int FORWARD_PORT = 0;

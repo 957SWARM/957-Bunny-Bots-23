@@ -27,6 +27,7 @@ import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.commands.BasicVisionTargetingCommand;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
@@ -138,6 +139,10 @@ public class RobotContainer {
         driver.intake().onTrue(Commands.runOnce(() -> ballPathState = RobotState.INTAKE));
         driver.eject().onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
         
+        driver.visionTargerting().toggleOnTrue(new BasicVisionTargetingCommand(
+            m_robotDrive, 
+            () -> -MathUtil.applyDeadband(driver.swerveY(), OIConstants.kDriveDeadband), 
+            () -> -MathUtil.applyDeadband(driver.swerveX(), OIConstants.kDriveDeadband)));
     }
 
     public void stateMachinePeriodic() {
