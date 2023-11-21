@@ -137,6 +137,11 @@ public class Constants {
     public static final class VisionTargetingConstants {
         // radians per second per error unit (pixels?)
         public static final double TARGETING_KP = 0.0;
+        
+        // this is just kP because:
+        // 1: this is for a second-order cascaded controller
+        // 2: the controller doesn't need to be that accurate
+        // 3: it's much easier to program the command if it's stateless (like a pure P controller)
     }
 
     public static final class BunnyGrabberConstants {
