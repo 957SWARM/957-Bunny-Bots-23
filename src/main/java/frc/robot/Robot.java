@@ -7,13 +7,10 @@ package frc.robot;
 import com.team957.lib.telemetry.BaseHardwareLogger;
 import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.microsystems.IMU;
 import frc.robot.microsystems.UI;
-import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -26,9 +23,6 @@ public class Robot extends TimedRobot {
 
     private RobotContainer m_robotContainer;
     private UI ui = UI.getInstance();
-
-    private final DriveSubsystem drive = new DriveSubsystem();
-    private final XboxController test = new XboxController(0);
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -103,15 +97,6 @@ public class Robot extends TimedRobot {
         }
 
         IMU.instance.setAngleToZero();
-
-        CommandScheduler.getInstance()
-                .schedule(
-                        new FieldRelativeControlCommand(
-                                drive,
-                                IMU.instance::getCorrectedAngle,
-                                () -> 6 * test.getLeftX(),
-                                () -> 6 * test.getLeftY(),
-                                () -> -6 * test.getRightX()));
     }
 
     /** This function is called periodically during operator control. */

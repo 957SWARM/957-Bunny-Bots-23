@@ -16,10 +16,12 @@ import frc.robot.commands.BasicVisionTargetingCommand;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
+import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
+import frc.robot.microsystems.IMU;
 import frc.robot.microsystems.IntakeStates;
 import frc.robot.microsystems.Limelight;
 import frc.robot.microsystems.RobotState;
@@ -66,6 +68,9 @@ public class RobotContainer {
 
     // Triggers
     // Control Triggers
+
+    Trigger zeroIMUTrigger;
+
     Trigger grabberTrigger;
     Trigger shootTrigger;
     Trigger cancelTrigger;
@@ -95,6 +100,14 @@ public class RobotContainer {
         dtUtilBreakBeam = new DeltaTimeUtil();
         dtUtilShooterCurrent = new DeltaTimeUtil();
 
+        drive.setDefaultCommand(
+                new FieldRelativeControlCommand(
+                        drive,
+                        IMU.instance::getCorrectedAngle,
+                        driver::swerveX,
+                        driver::swerveY,
+                        driver::swerveRot));
+
         // m_shooter.setDefaultCommand(new FlywheelControlCommand(m_shooter, () ->
         // targetShooterRPM));
 
@@ -104,13 +117,12 @@ public class RobotContainer {
                         () -> enableTransfer,
                         () -> currentShooterRPM,
                         () -> targetShooterRPM));
-        // Configure the trigger bindings
-
-        configureBindings();
 
         intake.setDefaultCommand(new IntakeControlCommand(intake, () -> intakeState.voltage()));
 
         shooter.setDefaultCommand(new ShooterControlCommand(shooter, () -> targetShooterRPM));
+
+        configureBindings();
     }
 
     /*
@@ -120,71 +132,93 @@ public class RobotContainer {
     private void configureBindings() {
 
         // CONTROL TRIGGERS
-        grabberTrigger = new Trigger(() -> driver.toggleGrabber());
-        grabberTrigger.onTrue(grabber.toggleBunnyGrabber());
+        zeroIMUTrigger =
+                new Trigger(() -> driver.zeroGyro())
+                        .onTrue(Commands.run(IMU.instance::setAngleToZero));
 
-        cancelTrigger = new Trigger(() -> driver.cancel());
-        cancelTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.IDLE));
+        grabberTrigger =
+                new Trigger(() -> driver.toggleGrabber()).onTrue(grabber.toggleBunnyGrabber());
 
-        shootTrigger = new Trigger(() -> driver.shoot());
-        shootTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.SHOOT));
+        cancelTrigger =
+                new Trigger(() -> driver.cancel())
+                        .onTrue(Commands.runOnce(() -> ballPathState = RobotState.IDLE));
 
-        intakeTrigger = new Trigger(() -> driver.intake());
-        intakeTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.INTAKE));
+        shootTrigger =
+                new Trigger(() -> driver.shoot())
+                        .onTrue(Commands.runOnce(() -> ballPathState = RobotState.SHOOT));
 
-        ejectTrigger = new Trigger(() -> driver.intake());
-        ejectTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
+        intakeTrigger =
+                new Trigger(() -> driver.intake())
+                        .onTrue(Commands.runOnce(() -> ballPathState = RobotState.INTAKE));
 
-        visionTrigger = new Trigger(() -> driver.visionTargeting());
-        visionTrigger.toggleOnTrue(
-                new BasicVisionTargetingCommand(drive, Limelight.getInstance()::getTx));
+        ejectTrigger =
+                new Trigger(() -> driver.intake())
+                        .onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
 
-        increaseBallTrigger = new Trigger(() -> driver.increaseBallCount());
-        increaseBallTrigger.onTrue(Commands.runOnce(() -> ballCount++));
+        visionTrigger =
+                new Trigger(() -> driver.visionTargeting())
+                        .toggleOnTrue(
+                                new BasicVisionTargetingCommand(
+                                        drive, Limelight.getInstance()::getTx));
 
-        decreaseBallTrigger = new Trigger(() -> driver.decreaseBallCount());
-        decreaseBallTrigger.onTrue(Commands.runOnce(() -> ballCount--));
+        increaseBallTrigger =
+                new Trigger(() -> driver.increaseBallCount())
+                        .onTrue(Commands.runOnce(() -> ballCount++));
+
+        decreaseBallTrigger =
+                new Trigger(() -> driver.decreaseBallCount())
+                        .onTrue(Commands.runOnce(() -> ballCount--));
 
         // SENSING TRIGGERS
         // increases ball count if breakbeam sensor detects something. Debounced to prevent rapid
         // changes
-        beamBrokenTrigger = new Trigger(() -> intake.isBeamBroken());
-        beamBrokenTrigger
-                .debounce(BallPathConstants.DEBOUNCE_SENSOR_TIME, Debouncer.DebounceType.kBoth)
-                .onTrue(Commands.runOnce(() -> ballCount++));
+        beamBrokenTrigger =
+                new Trigger(() -> intake.isBeamBroken())
+                        .debounce(
+                                BallPathConstants.DEBOUNCE_SENSOR_TIME,
+                                Debouncer.DebounceType.kBoth)
+                        .onTrue(Commands.runOnce(() -> ballCount++));
 
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
         currentThresholdTrigger =
-                new Trigger(() -> shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD));
-        currentThresholdTrigger
-                .debounce(BallPathConstants.DEBOUNCE_CURRENT_TIME, Debouncer.DebounceType.kBoth)
-                .onTrue(Commands.runOnce(() -> ballCount--));
+                new Trigger(() -> shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD))
+                        .debounce(
+                                BallPathConstants.DEBOUNCE_CURRENT_TIME,
+                                Debouncer.DebounceType.kBoth)
+                        .onTrue(Commands.runOnce(() -> ballCount--));
 
         // ejects balls if we have more than the max allowed (5)
-        tooManyBallsTrigger = new Trigger(() -> ballCount > BallPathConstants.MAX_BALL_COUNT);
-        tooManyBallsTrigger.onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
+        tooManyBallsTrigger =
+                new Trigger(() -> ballCount > BallPathConstants.MAX_BALL_COUNT)
+                        .onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
 
         // BLINKIN LIGHT TRIGGERS
-        greenTrigger = new Trigger(() -> ballCount == BlinkinConstants.GREEN_VALUE);
-        greenTrigger.onTrue(blinkin.green());
+        greenTrigger =
+                new Trigger(() -> ballCount == BlinkinConstants.GREEN_VALUE)
+                        .onTrue(blinkin.green());
+
         goldTrigger =
                 new Trigger(
-                        () ->
-                                ballCount >= BlinkinConstants.GOLD_RANGE_MIN
-                                        && ballCount <= BlinkinConstants.GOLD_RANGE_MAX);
-        goldTrigger.onTrue(blinkin.gold());
+                                () ->
+                                        ballCount >= BlinkinConstants.GOLD_RANGE_MIN
+                                                && ballCount <= BlinkinConstants.GOLD_RANGE_MAX)
+                        .onTrue(blinkin.gold());
+
         redOrangeTrigger =
                 new Trigger(
-                        () ->
-                                ballCount >= BlinkinConstants.REDORANGE_RANGE_MIN
-                                        && ballCount <= BlinkinConstants.REDORANGE_RANGE_MAX);
-        redOrangeTrigger.onTrue(blinkin.redOrange());
+                                () ->
+                                        ballCount >= BlinkinConstants.REDORANGE_RANGE_MIN
+                                                && ballCount
+                                                        <= BlinkinConstants.REDORANGE_RANGE_MAX)
+                        .onTrue(blinkin.redOrange());
+
         redTrigger =
                 new Trigger(
-                        () ->
-                                ballCount >= BlinkinConstants.RED_RANGE_UPPERBOUND
-                                        || ballCount < BlinkinConstants.RED_RANGE_LOWERBOUND);
-        redTrigger.onTrue(blinkin.red());
+                                () ->
+                                        ballCount >= BlinkinConstants.RED_RANGE_UPPERBOUND
+                                                || ballCount
+                                                        < BlinkinConstants.RED_RANGE_LOWERBOUND)
+                        .onTrue(blinkin.red());
     }
 
     public void stateMachinePeriodic() {
