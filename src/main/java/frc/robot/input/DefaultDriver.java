@@ -1,11 +1,10 @@
 package frc.robot.input;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class DefaultDriver implements DriverInput {
 
-    CommandXboxController xboxController;
+    private final CommandXboxController xboxController;
 
     public DefaultDriver(int port) {
 
@@ -23,36 +22,48 @@ public class DefaultDriver implements DriverInput {
     }
 
     @Override
-    public Trigger swerveFieldRelative() {
-        return xboxController.start();
+    public boolean swerveFieldRelative() {
+        return xboxController.start().getAsBoolean();
     }
 
     @Override
-    public Trigger zeroGyro() {
-        return xboxController.back();
+    public boolean zeroGyro() {
+        return xboxController.back().getAsBoolean();
     }
 
     public double swerveRot() {
         return xboxController.getRightX();
     }
 
-    public Trigger toggleGrabber() {
-        return xboxController.a();
+    public boolean toggleGrabber() {
+        return xboxController.leftBumper().getAsBoolean();
     }
 
     public boolean cancel() {
-        return xboxController.back().getAsBoolean();
+        return xboxController.y().getAsBoolean();
     }
 
     public boolean shoot() {
-        return xboxController.back().getAsBoolean();
+        return xboxController.b().getAsBoolean();
     }
 
     public boolean eject() {
-        return xboxController.back().getAsBoolean();
+        return xboxController.x().getAsBoolean();
     }
 
     public boolean intake() {
-        return xboxController.back().getAsBoolean();
+        return xboxController.a().getAsBoolean();
+    }
+
+    public boolean visionTargeting() {
+        return xboxController.b().getAsBoolean();
+    }
+
+    public boolean increaseBallCount() {
+        return xboxController.povUp().getAsBoolean();
+    }
+
+    public boolean decreaseBallCount() {
+        return xboxController.povDown().getAsBoolean();
     }
 }

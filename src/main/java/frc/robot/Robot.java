@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.microsystems.IMU;
+import frc.robot.microsystems.UI;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
@@ -24,6 +25,7 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private RobotContainer m_robotContainer;
+    private UI ui = UI.getInstance();
 
     private final DriveSubsystem drive = new DriveSubsystem();
     private final XboxController test = new XboxController(0);
@@ -62,6 +64,8 @@ public class Robot extends TimedRobot {
 
         HighLevelLogger.getInstance().updateLogs();
         BaseHardwareLogger.getInstance().updateLogs();
+
+        ui.periodic();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

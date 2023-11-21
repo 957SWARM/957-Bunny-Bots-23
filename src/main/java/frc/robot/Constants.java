@@ -31,7 +31,7 @@ public class Constants {
         public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(2.5, 0, 0);
         public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(2, 10, 0);
 
-        // TODO determine feedforward gains empirically
+        // look into feedforward again
         public static final double DRIVE_FEEDFORWARD_KS_VOLTS = 0;
         public static final double DRIVE_FEEDFORWARD_KV_VOLT_SECONDS_PER_METER = 0;
 
@@ -65,8 +65,9 @@ public class Constants {
     }
 
     public static final class OIConstants {
-        public static final int kDriverControllerPort = 0;
         public static final double kDriveDeadband = 0.05;
+        public static final int kDefaultDriverPort = 0;
+        public static final int kDefaultOperatorPort = 1;
     }
 
     public static final class AutoConstants {
@@ -89,6 +90,12 @@ public class Constants {
         public static final double kFreeSpeedRpm = 5676;
     }
 
+    public static final class BallPathConstants {
+        public static final int MAX_BALL_COUNT = 5;
+        public static final double DEBOUNCE_CURRENT_TIME = .3;
+        public static final double DEBOUNCE_SENSOR_TIME = .1;
+    }
+
     public static final class ShooterConstants {
         public static final double BB_TOL = 0;
         public static final int ENC_A = 0;
@@ -96,15 +103,24 @@ public class Constants {
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 0;
         public static final double RUNNING_VOLTAGE = 11;
+        public static final int SPEED_RPM = 3000;
+        public static final double WAIT_DURATION = 0.5;
+        public static final int DETECTION_THRESHOLD = 55;
+        public static final int CURRENT_LIMIT = 10;
     }
 
     public static final class IntakeConstants {
         public static final double CURRENT_FILTER_RESPONSE_CONSTANT = 0.5;
         public static final double HIGH_CURRENT_THRESHOLD_AMPS = 10;
 
-        public static final double MAX_RUNNING_VOLTAGE = 12;
+        public static final int CURRENT_LIMIT = 40;
+        public static final int VOLTAGE_LIMIT = 11;
+
         public static final double RUNNING_VOLTAGE = 9;
         public static final int CAN_ID = 0;
+
+        public static final int BREAKBEAM_DIO_PORT = 0;
+        public static final boolean BREAKBEAM_TRUE_WHEN_OCCLUDED = true;
     }
 
     public static final class TransferConstants {
@@ -114,6 +130,14 @@ public class Constants {
         public static final double kd = 0;
         public static final int RPM_TOLERANCE = 20;
         public static final double TRANSFER_PERCENT_POWER = .6;
+        public static final int CURRENT_LIMIT = 40;
+        public static final int VOLTAGE_LIMIT = 11;
+    }
+
+    public static final class VisionTargetingConstants {
+        public static final double TARGETING_KP = 0.0;
+        public static final double TARGETING_KI = 0.0;
+        public static final double TARGETING_KD = 0.0;
     }
 
     public static final class BunnyGrabberConstants {
@@ -123,12 +147,22 @@ public class Constants {
     }
 
     public static final class BlinkinConstants {
+        // Channel needs to be set
+        public static final int BLINKIN_CHANNEL = 0;
         public static final double GREEN = 0.73;
         public static final double RED = 0.61;
         public static final double GOLD = 0.67;
         public static final double REDORANGE = 0.63;
         public static final double AUTOMATION = -0.57;
         public static final double SECOND_AUTOMATION = -0.89;
+
+        public static final int GREEN_VALUE = 0;
+        public static final int GOLD_RANGE_MIN = 1;
+        public static final int GOLD_RANGE_MAX = 2;
+        public static final int REDORANGE_RANGE_MIN = 3;
+        public static final int REDORANGE_RANGE_MAX = 4;
+        public static final int RED_RANGE_UPPERBOUND = 5;
+        public static final int RED_RANGE_LOWERBOUND = 0;
     }
 
     public static final class IMUConstants {

@@ -6,6 +6,7 @@ import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.microsystems.UI;
 
 public class BunnyGrabberSubsystem extends SubsystemBase {
 
@@ -31,5 +32,9 @@ public class BunnyGrabberSubsystem extends SubsystemBase {
 
     public CommandBase toggleBunnyGrabber() {
         return this.runOnce(() -> piston.toggle());
+    }
+
+    public void periodic() {
+        UI.getInstance().grabberState(!(piston.get() == Value.kOff));
     }
 }

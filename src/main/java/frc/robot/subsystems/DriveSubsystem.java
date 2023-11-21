@@ -217,7 +217,6 @@ public class DriveSubsystem implements Subsystem {
                     invertDrive,
                     name,
                     "swerve");
-            // TODO: may need to invert motors or encoder
         }
 
         public void setDriveControlInput(double volts) {
