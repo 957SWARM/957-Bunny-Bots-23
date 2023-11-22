@@ -101,7 +101,7 @@ public class Constants {
         public static final int ENC_A = 0;
         public static final int ENC_B = 1;
         public static final boolean ENC_REV = false;
-        public static final int CAN_ID = 0;
+        public static final int CAN_ID = 11;
         public static final double RUNNING_VOLTAGE = 11;
         public static final int SPEED_RPM = 3000;
         public static final double WAIT_DURATION = 0.5;
@@ -117,14 +117,14 @@ public class Constants {
         public static final int VOLTAGE_LIMIT = 11;
 
         public static final double RUNNING_VOLTAGE = 9;
-        public static final int CAN_ID = 0;
+        public static final int CAN_ID = 10;
 
-        public static final int BREAKBEAM_DIO_PORT = 0;
+        public static final int BREAKBEAM_DIO_PORT = 2;
         public static final boolean BREAKBEAM_TRUE_WHEN_OCCLUDED = true;
     }
 
     public static final class TransferConstants {
-        public static final int CAN_ID = 0;
+        public static final int CAN_ID = 9;
         public static final double kp = 0;
         public static final double ki = 0;
         public static final double kd = 0;
@@ -173,5 +173,10 @@ public class Constants {
         public static final boolean YAW_AXIS_INVERTED = true;
         // this should NOT be applied to the navx.getRotation2D(), that's already offset
         // this is for the angular rate
+    }
+  
+    public static final class RobotConstants{
+        public static final int PDH_CAN_ID = 30;
+        public static final int PCH_CAN_ID = 31;
     }
 }
