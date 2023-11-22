@@ -1,9 +1,11 @@
 package frc.robot.input;
 
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import edu.wpi.first.wpilibj2.command.button.Trigger;
 
 public class DefaultDriver implements DriverInput {
+
+    private static final double LIN_MAX_SPEED = 3;
+    private static final double ROT_MAX_SPEED = 6;
 
     private final CommandXboxController xboxController;
 
@@ -14,17 +16,12 @@ public class DefaultDriver implements DriverInput {
 
     @Override
     public double swerveX() {
-        return xboxController.getLeftX();
+        return LIN_MAX_SPEED * xboxController.getLeftX();
     }
 
     @Override
     public double swerveY() {
-        return -xboxController.getLeftY();
-    }
-
-    @Override
-    public boolean swerveFieldRelative() {
-        return xboxController.start().getAsBoolean();
+        return LIN_MAX_SPEED * -xboxController.getLeftY();
     }
 
     @Override
@@ -33,7 +30,7 @@ public class DefaultDriver implements DriverInput {
     }
 
     public double swerveRot() {
-        return xboxController.getRightX();
+        return ROT_MAX_SPEED * xboxController.getRightX();
     }
 
     public boolean toggleGrabber() {
@@ -56,15 +53,15 @@ public class DefaultDriver implements DriverInput {
         return xboxController.a().getAsBoolean();
     }
 
-    public boolean visionTargeting(){
+    public boolean visionTargeting() {
         return xboxController.b().getAsBoolean();
     }
 
-    public boolean increaseBallCount(){
+    public boolean increaseBallCount() {
         return xboxController.povUp().getAsBoolean();
     }
 
-    public boolean decreaseBallCount(){
+    public boolean decreaseBallCount() {
         return xboxController.povDown().getAsBoolean();
     }
 }

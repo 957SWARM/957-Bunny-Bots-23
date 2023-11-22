@@ -4,9 +4,12 @@
 
 package frc.robot;
 
+import com.team957.lib.telemetry.BaseHardwareLogger;
+import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.microsystems.IMU;
 import frc.robot.microsystems.UI;
 
 /**
@@ -31,6 +34,11 @@ public class Robot extends TimedRobot {
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+
+        HighLevelLogger.getInstance().startLogging();
+        HighLevelLogger.getInstance().autoGenerateLogs("highLevel", "base");
+
+        BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
     }
 
     /**
@@ -48,6 +56,10 @@ public class Robot extends TimedRobot {
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
         m_robotContainer.stateMachinePeriodic();
+
+        HighLevelLogger.getInstance().updateLogs();
+        BaseHardwareLogger.getInstance().updateLogs();
+
         ui.periodic();
         timerControllerUpdate += .02;
         if(timerControllerUpdate >= 1){
@@ -89,6 +101,8 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+
+        IMU.instance.setAngleToZero();
     }
 
     /** This function is called periodically during operator control. */

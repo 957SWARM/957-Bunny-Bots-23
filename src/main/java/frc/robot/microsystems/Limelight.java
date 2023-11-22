@@ -4,7 +4,7 @@ import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
-public final class Limelight{
+public final class Limelight {
 
     private static Limelight INSTANCE;
 
@@ -30,14 +30,13 @@ public final class Limelight{
     DoubleSubscriber jsonSub = table.getDoubleTopic("tjson").subscribe(0);
     DoubleSubscriber getpipeSub = table.getDoubleTopic("getpipe").subscribe(0);
 
+    private Limelight() {}
 
-    private Limelight(){}
-
-    public static Limelight getInstance(){
+    public static Limelight getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new Limelight();
         }
-        
+
         return INSTANCE;
     }
 

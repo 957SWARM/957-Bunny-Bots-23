@@ -8,7 +8,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.BlinkinConstants;
 
-public class BlinkinSubsystem extends SubsystemBase{
+public class BlinkinSubsystem extends SubsystemBase {
 
     private final Spark motor;
 

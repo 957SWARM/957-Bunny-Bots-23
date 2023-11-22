@@ -29,10 +29,12 @@ public final class UI {
         autoChooser.setDefaultOption("No Auto?", new InstantCommand());
 
         driverChooser = new SendableChooser<>();
-        driverChooser.setDefaultOption("Default Driver", new DefaultDriver(OIConstants.kDefaultDriverPort));
+        driverChooser.setDefaultOption(
+                "Default Driver", new DefaultDriver(OIConstants.kDefaultDriverPort));
 
         operatorChooser = new SendableChooser<>();
-        operatorChooser.setDefaultOption("Default Operator", new DefaultOperator(OIConstants.kDefaultOperatorPort));
+        operatorChooser.setDefaultOption(
+                "Default Operator", new DefaultOperator(OIConstants.kDefaultOperatorPort));
     }
 
     public static UI getInstance() {
@@ -52,7 +54,6 @@ public final class UI {
         SmartDashboard.putData("Auto Selector", autoChooser);
         SmartDashboard.putData("Driver Selector", driverChooser);
         SmartDashboard.putData("Operator Selector", operatorChooser);
-    
     }
 
     public void setBallCount(int ballCount) {

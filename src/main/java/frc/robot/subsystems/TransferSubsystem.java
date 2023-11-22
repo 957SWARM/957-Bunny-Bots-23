@@ -8,7 +8,6 @@ import frc.robot.Constants.TransferConstants;
 public class TransferSubsystem extends SubsystemBase {
 
     private final TalonSRX motor;
-    private final boolean isEnabled;
 
     public TransferSubsystem() {
         motor = new TalonSRX(TransferConstants.CAN_ID);
@@ -16,9 +15,6 @@ public class TransferSubsystem extends SubsystemBase {
         motor.configFactoryDefault();
         // motor.configVoltageCompSaturation(TransferConstants.VOLTAGE_LIMIT);
         motor.configPeakCurrentLimit(TransferConstants.CURRENT_LIMIT);
-
-        // Default behavior
-        isEnabled = false;
     }
 
     public void on() {

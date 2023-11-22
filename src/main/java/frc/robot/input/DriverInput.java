@@ -1,17 +1,17 @@
 package frc.robot.input;
 
-import edu.wpi.first.wpilibj2.command.button.Trigger;
-
 public interface DriverInput {
 
+    // in meters/sec
     public double swerveX();
 
+    // in meters/sec
     public double swerveY();
 
-    public boolean swerveFieldRelative();
-
+    // on rising edge
     public boolean zeroGyro();
 
+    // in radians/sec
     public double swerveRot();
 
     public boolean toggleGrabber();

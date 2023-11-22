@@ -3,7 +3,6 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -53,14 +52,9 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     public void periodic() {
-        // TODO: define periodic behavior of the subsystem.
         filterOutput = filter.calculate(motor.getOutputCurrent());
-        
-        UI.getInstance().setShooterSpeed(encoder.getRate() / 2048 / 40);
-    }
 
-    public void simulationPeriodic() {
-        // TODO: define periodic behavior of the subsystem in a simulation.
+        UI.getInstance().setShooterSpeed(encoder.getRate() / 2048 / 40);
     }
 
     public void setVoltage(double volts) {
