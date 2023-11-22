@@ -369,6 +369,6 @@ public class DriveSubsystem implements Subsystem {
                     for (MaxSwerveModule module :
                             new MaxSwerveModule[] {frontLeft, frontRight, backRight, backLeft})
                         module.setBrakeMode(enabled);
-                });
+                }).ignoringDisable(true);
     }
 }
