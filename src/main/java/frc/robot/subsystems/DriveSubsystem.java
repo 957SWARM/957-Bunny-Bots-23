@@ -365,10 +365,12 @@ public class DriveSubsystem implements Subsystem {
 
     public Command setBrakeModeCommand(boolean enabled) {
         return Commands.runOnce(
-                () -> {
-                    for (MaxSwerveModule module :
-                            new MaxSwerveModule[] {frontLeft, frontRight, backRight, backLeft})
-                        module.setBrakeMode(enabled);
-                }).ignoringDisable(true);
+                        () -> {
+                            for (MaxSwerveModule module :
+                                    new MaxSwerveModule[] {
+                                        frontLeft, frontRight, backRight, backLeft
+                                    }) module.setBrakeMode(enabled);
+                        })
+                .ignoringDisable(true);
     }
 }

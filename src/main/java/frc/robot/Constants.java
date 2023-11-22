@@ -174,8 +174,8 @@ public class Constants {
         // this should NOT be applied to the navx.getRotation2D(), that's already offset
         // this is for the angular rate
     }
-  
-    public static final class RobotConstants{
+
+    public static final class RobotConstants {
         public static final int PDH_CAN_ID = 30;
         public static final int PCH_CAN_ID = 31;
     }

@@ -62,7 +62,7 @@ public class Robot extends TimedRobot {
 
         ui.periodic();
         timerControllerUpdate += .02;
-        if(timerControllerUpdate >= 1){
+        if (timerControllerUpdate >= 1) {
             m_robotContainer.updateControllers();
             timerControllerUpdate = 0;
         }
