@@ -12,23 +12,19 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.BallPathConstants;
 import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.commands.BasicVisionTargetingCommand;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
-import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.microsystems.IMU;
 import frc.robot.microsystems.IntakeStates;
-import frc.robot.microsystems.Limelight;
 import frc.robot.microsystems.RobotState;
 import frc.robot.microsystems.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
@@ -40,7 +36,6 @@ public class RobotContainer {
     OperatorInput operator = new DefaultOperator(1);
 
     // Subsystems
-    private final DriveSubsystem drive = new DriveSubsystem();
     private final ShooterSubsystem shooter = new ShooterSubsystem();
     private final BunnyGrabberSubsystem grabber = new BunnyGrabberSubsystem();
     private final TransferSubsystem transfer = new TransferSubsystem();
@@ -100,14 +95,6 @@ public class RobotContainer {
         dtUtilBreakBeam = new DeltaTimeUtil();
         dtUtilShooterCurrent = new DeltaTimeUtil();
 
-        drive.setDefaultCommand(
-                new FieldRelativeControlCommand(
-                        drive,
-                        IMU.instance::getCorrectedAngle,
-                        driver::swerveX,
-                        driver::swerveY,
-                        driver::swerveRot));
-
         // m_shooter.setDefaultCommand(new FlywheelControlCommand(m_shooter, () ->
         // targetShooterRPM));
 
@@ -158,11 +145,11 @@ public class RobotContainer {
                 new Trigger(() -> driver.intake())
                         .onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
 
-        visionTrigger =
-                new Trigger(() -> driver.visionTargeting())
-                        .toggleOnTrue(
-                                new BasicVisionTargetingCommand(
-                                        drive, Limelight.getInstance()::getTx));
+        // visionTrigger =
+        //         new Trigger(() -> driver.visionTargeting())
+        //                 .toggleOnTrue(
+        //                         new BasicVisionTargetingCommand(
+        //                                 drive, Limelight.getInstance()::getTx));
 
         increaseBallTrigger =
                 new Trigger(() -> driver.increaseBallCount())

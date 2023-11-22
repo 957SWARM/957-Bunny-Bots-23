@@ -34,10 +34,10 @@ public class BunnyGrabberSubsystem extends SubsystemBase {
         return this.runOnce(() -> piston.toggle());
     }
 
-    public void periodic(){
-        if(piston.get() == Value.kForward){
+    public void periodic() {
+        if (piston.get() == Value.kForward) {
             UI.getInstance().grabberState(true);
-        }else{
+        } else {
             UI.getInstance().grabberState(false);
         }
     }

@@ -53,7 +53,7 @@ public class Constants {
         // the offset is the "raw" value reported when the module is at the "zero" position
 
         // last updated: November 15 8:30 PM
-        public static final double FRONT_LEFT_OFFSET_RADIANS = -(Math.PI / 2);
+        public static final double FRONT_LEFT_OFFSET_RADIANS = 2.62 - (Math.PI / 2);
         public static final double FRONT_RIGHT_OFFSET_RADIANS = 0;
         public static final double BACK_RIGHT_OFFSET_RADIANS = -(Math.PI / 2);
         public static final double BACK_LEFT_OFFSET_RADIANS = 0;
@@ -174,8 +174,8 @@ public class Constants {
         // this should NOT be applied to the navx.getRotation2D(), that's already offset
         // this is for the angular rate
     }
-  
-    public static final class RobotConstants{
+
+    public static final class RobotConstants {
         public static final int PDH_CAN_ID = 30;
         public static final int PCH_CAN_ID = 31;
     }
