@@ -200,28 +200,19 @@ public class RobotContainer {
                 new Trigger(() -> ballCount == BlinkinConstants.GREEN_VALUE)
                         .onTrue(blinkin.green());
 
-        goldTrigger =
-                new Trigger(
-                                () ->
-                                        ballCount >= BlinkinConstants.GOLD_RANGE_MIN
-                                                && ballCount <= BlinkinConstants.GOLD_RANGE_MAX)
+        // spotless:off
+        goldTrigger = new Trigger(() ->
+                ballCount >= BlinkinConstants.GOLD_RANGE_MIN && ballCount <= BlinkinConstants.GOLD_RANGE_MAX)
                         .onTrue(blinkin.gold());
 
-        redOrangeTrigger =
-                new Trigger(
-                                () ->
-                                        ballCount >= BlinkinConstants.REDORANGE_RANGE_MIN
-                                                && ballCount
-                                                        <= BlinkinConstants.REDORANGE_RANGE_MAX)
+        redOrangeTrigger = new Trigger(() ->
+                ballCount >= BlinkinConstants.REDORANGE_RANGE_MIN && ballCount <= BlinkinConstants.REDORANGE_RANGE_MAX)
                         .onTrue(blinkin.redOrange());
 
-        redTrigger =
-                new Trigger(
-                                () ->
-                                        ballCount >= BlinkinConstants.RED_RANGE_UPPERBOUND
-                                                || ballCount
-                                                        < BlinkinConstants.RED_RANGE_LOWERBOUND)
+        redTrigger = new Trigger(() ->
+                ballCount >= BlinkinConstants.RED_RANGE_UPPERBOUND || ballCount < BlinkinConstants.RED_RANGE_LOWERBOUND)
                         .onTrue(blinkin.red());
+        // spotless:on
     }
 
     public void stateMachinePeriodic() {
