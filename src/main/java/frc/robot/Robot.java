@@ -4,10 +4,17 @@
 
 package frc.robot;
 
-import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.filter.SlewRateLimiter;
+import com.team957.lib.telemetry.BaseHardwareLogger;
+import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
-import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
+import frc.robot.input.DefaultDriver;
+import frc.robot.input.DriverInput;
+import frc.robot.microsystems.IMU;
+import frc.robot.microsystems.UI;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -16,86 +23,124 @@ import edu.wpi.first.wpilibj.XboxController;
  * project.
  */
 public class Robot extends TimedRobot {
-  /**
-   * This function is run when the robot is first started up and should be used for any
-   * initialization code.
-   */
-    // Offsets of the swerve modules must be set to 0 before code works
+    private Command m_autonomousCommand;
 
-  private DriveControl m_controller = new DriveControl(0);
-  private final Drivetrain m_swerve = new Drivetrain(0, 0, 0, 0);
+    private RobotContainer m_robotContainer;
+    private UI ui = UI.getInstance();
+    double timerControllerUpdate = 0;
 
-  private final SlewRateLimiter m_xspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_yspeedLimiter = new SlewRateLimiter(3);
-  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(3);
-    
-  @Override
-  public void robotInit() {}
+    private final DriverInput driver = new DefaultDriver(0);
+    private final DriveSubsystem drive = new DriveSubsystem();
 
-  @Override
-  public void robotPeriodic() {}
+    /**
+     * This function is run when the robot is first started up and should be used for any
+     * initialization code.
+     */
+    @Override
+    public void robotInit() {
+        // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
+        // autonomous chooser on the dashboard.
+        m_robotContainer = new RobotContainer();
 
-  @Override
-  public void autonomousInit() {}
+        HighLevelLogger.getInstance().startLogging();
+        HighLevelLogger.getInstance().autoGenerateLogs("highLevel", "base");
 
-  @Override
-  public void autonomousPeriodic() {
-    driveWithJoystick(false);
-    m_swerve.updateOdometry();
-  }
+        BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
+    }
 
-  @Override
-  public void teleopInit() {}
+    /**
+     * This function is called every 20 ms, no matter the mode. Use this for items like diagnostics
+     * that you want ran during disabled, autonomous, teleoperated and test.
+     *
+     * <p>This runs after the mode specific periodic functions, but before LiveWindow and
+     * SmartDashboard integrated updating.
+     */
+    @Override
+    public void robotPeriodic() {
+        // Runs the Scheduler.  This is responsible for polling buttons, adding newly-scheduled
+        // commands, running already-scheduled commands, removing finished or interrupted commands,
+        // and running subsystem periodic() methods.  This must be called from the robot's periodic
+        // block in order for anything in the Command-based framework to work.
+        CommandScheduler.getInstance().run();
+        m_robotContainer.stateMachinePeriodic();
 
-  @Override
-  public void teleopPeriodic() {
-    driveWithJoystick(true);
-    m_swerve.updateOdometry();
-  }
+        HighLevelLogger.getInstance().updateLogs();
+        BaseHardwareLogger.getInstance().updateLogs();
 
-  @Override
-  public void disabledInit() {}
+        ui.periodic();
+        timerControllerUpdate += .02;
+        if (timerControllerUpdate >= 1) {
+            m_robotContainer.updateControllers();
+            timerControllerUpdate = 0;
+        }
+    }
 
-  @Override
-  public void disabledPeriodic() {}
+    /** This function is called once each time the robot enters Disabled mode. */
+    @Override
+    public void disabledInit() {}
 
-  @Override
-  public void testInit() {}
+    @Override
+    public void disabledPeriodic() {}
 
-  @Override
-  public void testPeriodic() {}
+    /**
+     * This autonomous runs the autonomous command selected by your {@link RobotContainer} class.
+     */
+    @Override
+    public void autonomousInit() {
+        // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
-  @Override
-  public void simulationInit() {}
+        // schedule the autonomous command (example)
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.schedule();
+        }
+    }
 
-  @Override
-  public void simulationPeriodic() {}
+    /** This function is called periodically during autonomous. */
+    @Override
+    public void autonomousPeriodic() {}
 
+    @Override
+    public void teleopInit() {
+        // This makes sure that the autonomous stops running when
+        // teleop starts running. If you want the autonomous to
+        // continue until interrupted by another command, remove
+        // this line or comment it out.
+        if (m_autonomousCommand != null) {
+            m_autonomousCommand.cancel();
+        }
 
-  // Robot.java Methods
+        IMU.instance.setAngleToZero();
 
-  private void driveWithJoystick(boolean fieldRelative) {
-    // Get the x speed. We are inverting this because Xbox controllers return
-    // negative values when we push forward.
-    final var xSpeed =
-        m_xspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getYAxisDrive(), 0.1))
-            * Drivetrain.kMaxSpeed;
+        // temporary workaround for commandscheduler requirements issues
+        CommandScheduler.getInstance()
+                .schedule(
+                        new FieldRelativeControlCommand(
+                                drive,
+                                IMU.instance::getCorrectedAngle,
+                                driver::swerveX,
+                                driver::swerveY,
+                                driver::swerveRot));
+    }
 
-    // Get the y speed or sideways/strafe speed. We are inverting this because
-    // we want a positive value when we pull to the left. Xbox controllers
-    // return positive values when you pull to the right by default.
-    final var ySpeed =
-        m_yspeedLimiter.calculate(MathUtil.applyDeadband(m_controller.getXAxisDrive(), 0.1))
-            * Drivetrain.kMaxSpeed;
+    /** This function is called periodically during operator control. */
+    @Override
+    public void teleopPeriodic() {}
 
-    // Get the rate of angular rotation. We are inverting this because we want a
-    // positive value when we pull to the left (remember, CCW is positive in
-    // mathematics). Xbox controllers return positive values when you pull to
-    // the right by default.
-    final var rot =
-        m_rotLimiter.calculate(MathUtil.applyDeadband(m_controller.getGTurnAxis(), 0.1))
-            * Drivetrain.kMaxAngularSpeed;
+    @Override
+    public void testInit() {
+        // Cancels all running commands at the start of test mode.
+        CommandScheduler.getInstance().cancelAll();
+    }
 
-    m_swerve.drive(xSpeed, ySpeed, rot, fieldRelative);
-  }
+    /** This function is called periodically during test mode. */
+    @Override
+    public void testPeriodic() {}
+
+    /** This function is called once when the robot is first started up. */
+    @Override
+    public void simulationInit() {}
+
+    /** This function is called periodically whilst in simulation. */
+    @Override
+    public void simulationPeriodic() {}
 }
