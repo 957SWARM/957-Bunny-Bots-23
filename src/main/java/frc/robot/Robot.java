@@ -20,6 +20,7 @@ public class Robot extends TimedRobot {
 
     private RobotContainer m_robotContainer;
     private UI ui = UI.getInstance();
+    double timerControllerUpdate = 0;
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -48,6 +49,11 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         m_robotContainer.stateMachinePeriodic();
         ui.periodic();
+        timerControllerUpdate += .02;
+        if(timerControllerUpdate >= 1){
+            m_robotContainer.updateControllers();
+            timerControllerUpdate = 0;
+        }
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
