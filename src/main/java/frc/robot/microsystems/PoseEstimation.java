@@ -35,4 +35,8 @@ public class PoseEstimation {
     public Pose2d getPoseEstimate() {
         return odometry.getPoseMeters();
     }
+
+    public void overridePose(Pose2d newPose) {
+        odometry.resetPosition(rotation.get(), swerveModuleStates.get().asArray(), newPose);
+    }
 }

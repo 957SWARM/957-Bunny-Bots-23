@@ -14,7 +14,7 @@ import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 public class PathFollowCommands {
-    public Command getPathFollowCommand(
+    public static Command getPathFollowCommand(
             DriveSubsystem drive, Supplier<Pose2d> localization, PathPlannerTrajectory path) {
         final PID xFeedback = new PID(Constants.PathFollowingConstants.LINEAR_CASCADE_CONSTANTS, 0);
         final PID yFeedback = new PID(Constants.PathFollowingConstants.LINEAR_CASCADE_CONSTANTS, 0);
@@ -60,13 +60,24 @@ public class PathFollowCommands {
                     double feedforward = state.angularVelocityRadPerSec;
 
                     thetaFeedback.setSetpoint(state.holonomicRotation.getRadians());
-                    double feedback = thetaFeedback.calculate(localization.get().getY());
+                    double feedback =
+                            thetaFeedback.calculate(localization.get().getRotation().getRadians());
 
                     return feedback + feedforward;
                 };
 
-        return new ChassisControlCommand(
-                        drive, xVelocitySetpoint, yVelocitySetpoint, angularVelocitySetpoint)
-                .alongWith(Commands.runOnce(timer::start));
+        return Commands.runOnce(timer::start)
+                .andThen(
+                        new ChassisControlCommand(
+                                        drive,
+                                        xVelocitySetpoint,
+                                        yVelocitySetpoint,
+                                        angularVelocitySetpoint)
+                                .until(
+                                        () ->
+                                                (path.getTotalTimeSeconds() < timer.get())
+                                                        && xFeedback.atSetpoint()
+                                                        && yFeedback.atSetpoint()
+                                                        && thetaFeedback.atSetpoint()));
     }
 }

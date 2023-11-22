@@ -4,8 +4,12 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.team957.lib.util.DeltaTimeUtil;
 import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -17,6 +21,7 @@ import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
 import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
+import frc.robot.commands.drivetrain.PathFollowCommands;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
@@ -24,6 +29,7 @@ import frc.robot.input.OperatorInput;
 import frc.robot.microsystems.IMU;
 import frc.robot.microsystems.IntakeStates;
 import frc.robot.microsystems.Limelight;
+import frc.robot.microsystems.PoseEstimation;
 import frc.robot.microsystems.RobotState;
 import frc.robot.microsystems.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
@@ -46,6 +52,9 @@ public class RobotContainer {
     private final TransferSubsystem transfer = new TransferSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
     private final BlinkinSubsystem blinkin = new BlinkinSubsystem(BlinkinConstants.BLINKIN_CHANNEL);
+
+    private final PoseEstimation poseEstimation;
+    private final IMU imu = IMU.instance;
 
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
@@ -96,6 +105,8 @@ public class RobotContainer {
      * Sets up default commands and calls configureBindings()
      */
     public RobotContainer() {
+        poseEstimation = new PoseEstimation(drive::getStates, imu::getCorrectedAngle, new Pose2d());
+
         // timer object
         dtUtilBreakBeam = new DeltaTimeUtil();
         dtUtilShooterCurrent = new DeltaTimeUtil();
@@ -266,7 +277,17 @@ public class RobotContainer {
     }
 
     public Command getAutonomousCommand() {
-        return null;
+        PathPlannerTrajectory path =
+                PathPlanner.loadPath("New Path.path", new PathConstraints(1, 1));
+
+        return Commands.runOnce(
+                        () -> {
+                            poseEstimation.overridePose(path.getInitialHolonomicPose());
+                        })
+                .andThen(
+                        PathFollowCommands.getPathFollowCommand(
+                                drive, poseEstimation::getPoseEstimate, path));
+        // TODO implement chooser
     }
 
     public void updateControllers() {
