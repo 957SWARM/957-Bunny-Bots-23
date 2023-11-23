@@ -4,9 +4,17 @@
 
 package frc.robot;
 
+import com.team957.lib.telemetry.BaseHardwareLogger;
+import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
+import frc.robot.input.DefaultDriver;
+import frc.robot.input.DriverInput;
+import frc.robot.microsystems.IMU;
+import frc.robot.microsystems.UI;
+import frc.robot.subsystems.DriveSubsystem;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -18,6 +26,11 @@ public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private RobotContainer m_robotContainer;
+    private UI ui = UI.getInstance();
+    double timerControllerUpdate = 0;
+
+    private final DriverInput driver = new DefaultDriver(0);
+    private final DriveSubsystem drive = new DriveSubsystem();
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -28,6 +41,11 @@ public class Robot extends TimedRobot {
         // Instantiate our RobotContainer.  This will perform all our button bindings, and put our
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
+
+        HighLevelLogger.getInstance().startLogging();
+        HighLevelLogger.getInstance().autoGenerateLogs("highLevel", "base");
+
+        BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
     }
 
     /**
@@ -45,6 +63,16 @@ public class Robot extends TimedRobot {
         // block in order for anything in the Command-based framework to work.
         CommandScheduler.getInstance().run();
         m_robotContainer.stateMachinePeriodic();
+
+        HighLevelLogger.getInstance().updateLogs();
+        BaseHardwareLogger.getInstance().updateLogs();
+
+        ui.periodic();
+        timerControllerUpdate += .02;
+        if (timerControllerUpdate >= 1) {
+            m_robotContainer.updateControllers();
+            timerControllerUpdate = 0;
+        }
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -80,6 +108,18 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
+
+        IMU.instance.setAngleToZero();
+
+        // temporary workaround for commandscheduler requirements issues
+        CommandScheduler.getInstance()
+                .schedule(
+                        new FieldRelativeControlCommand(
+                                drive,
+                                IMU.instance::getCorrectedAngle,
+                                driver::swerveX,
+                                driver::swerveY,
+                                driver::swerveRot));
     }
 
     /** This function is called periodically during operator control. */

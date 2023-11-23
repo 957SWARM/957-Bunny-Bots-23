@@ -4,259 +4,373 @@
 
 package frc.robot.subsystems;
 
-import com.kauailabs.navx.frc.AHRS;
-import edu.wpi.first.math.filter.SlewRateLimiter;
-import edu.wpi.first.math.geometry.Pose2d;
+import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
+import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
+import com.team957.lib.math.UtilityMath;
+import com.team957.lib.telemetry.HighLevelLogger;
+import com.team957.lib.telemetry.Logger;
+import com.team957.lib.util.GearRatioHelper;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.ChassisSpeeds;
-import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.util.WPIUtilJNI;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
-import frc.robot.util.MAXSwerveModule;
-import frc.robot.util.SwerveUtils;
+import edu.wpi.first.math.util.Units;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.Subsystem;
+import frc.robot.Constants;
 
-public class DriveSubsystem extends SubsystemBase {
-    // Create MAXSwerveModules
-    private final MAXSwerveModule m_frontLeft =
-            new MAXSwerveModule(
-                    DriveConstants.kFrontLeftDrivingCanId,
-                    DriveConstants.kFrontLeftTurningCanId,
-                    DriveConstants.kFrontLeftChassisAngularOffset);
+public class DriveSubsystem implements Subsystem {
+    public class MaxSwerveModule {
+        private final Logger<Boolean> brakeModeEnabledLogger;
 
-    private final MAXSwerveModule m_frontRight =
-            new MAXSwerveModule(
-                    DriveConstants.kFrontRightDrivingCanId,
-                    DriveConstants.kFrontRightTurningCanId,
-                    DriveConstants.kFrontRightChassisAngularOffset);
+        private final Logger<Double> steerCurrentLogger;
+        private Logger<Double> driveCurrentLogger;
 
-    private final MAXSwerveModule m_rearLeft =
-            new MAXSwerveModule(
-                    DriveConstants.kRearLeftDrivingCanId,
-                    DriveConstants.kRearLeftTurningCanId,
-                    DriveConstants.kBackLeftChassisAngularOffset);
+        private final Logger<Double> steerAppliedVoltageLogger;
+        private final Logger<Double> driveAppliedVoltageLogger;
 
-    private final MAXSwerveModule m_rearRight =
-            new MAXSwerveModule(
-                    DriveConstants.kRearRightDrivingCanId,
-                    DriveConstants.kRearRightTurningCanId,
-                    DriveConstants.kBackRightChassisAngularOffset);
+        private final Logger<Double> steerBusVoltageLogger;
+        private final Logger<Double> driveBusVoltageLogger;
 
-    // The gyro sensor
-    private final AHRS m_gyro = new AHRS();
+        private final Logger<Double> steerTemperatureLogger;
+        private final Logger<Double> driveTemperatureLogger;
 
-    // Slew rate filter variables for controlling lateral acceleration
-    private double m_currentRotation = 0.0;
-    private double m_currentTranslationDir = 0.0;
-    private double m_currentTranslationMag = 0.0;
+        private final Logger<Double> unoffsetSteerLogger;
+        private final Logger<Double> steerLogger;
 
-    private SlewRateLimiter m_magLimiter = new SlewRateLimiter(DriveConstants.kMagnitudeSlewRate);
-    private SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kRotationalSlewRate);
-    private double m_prevTime = WPIUtilJNI.now() * 1e-6;
+        private final Logger<Double> drivePositionLogger;
+        private final Logger<Double> driveVelocityLogger;
 
-    // Odometry class for tracking robot pose
-    SwerveDriveOdometry m_odometry =
-            new SwerveDriveOdometry(
-                    DriveConstants.kDriveKinematics,
-                    Rotation2d.fromDegrees(m_gyro.getAngle()),
-                    new SwerveModulePosition[] {
-                        m_frontLeft.getPosition(),
-                        m_frontRight.getPosition(),
-                        m_rearLeft.getPosition(),
-                        m_rearRight.getPosition()
-                    });
+        private boolean brakeModeEnabled = false;
 
-    /** Creates a new DriveSubsystem. */
-    public DriveSubsystem() {}
+        private enum Gearing {
+            L1(new GearRatioHelper(5.5)),
+            L2(new GearRatioHelper(5.08)),
+            L3(new GearRatioHelper(4.71));
+
+            final GearRatioHelper ratio;
+
+            Gearing(GearRatioHelper ratio) {
+                this.ratio = ratio;
+            }
+        }
+
+        private final CANSparkMax drive;
+        private final CANSparkMax steer;
+
+        private final Gearing driveRatio;
+        private final double offsetRadians;
+
+        private final boolean invertDrive;
+
+        private MaxSwerveModule(
+                int driveCanId,
+                int steerCanId,
+                Gearing driveRatio,
+                double offsetRadians,
+                int driveCurrentLimitAmps,
+                int steerCurrentLimitAmps,
+                boolean invertDrive,
+                String name,
+                String subdirName) {
+            drive = new CANSparkMax(driveCanId, MotorType.kBrushless);
+            drive.restoreFactoryDefaults();
+            drive.setSmartCurrentLimit(driveCurrentLimitAmps);
+
+            steer = new CANSparkMax(steerCanId, MotorType.kBrushless);
+            drive.restoreFactoryDefaults();
+            steer.setSmartCurrentLimit(steerCurrentLimitAmps);
+
+            this.driveRatio = driveRatio;
+            this.offsetRadians = offsetRadians;
+
+            setBrakeMode(Constants.DriveConstants.DEFAULT_BRAKE_MODE_ENABLED);
+
+            this.invertDrive = invertDrive;
+
+            brakeModeEnabledLogger =
+                    new Logger<>(
+                            () -> brakeModeEnabled,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/brakeModeEnabled",
+                            subdirName,
+                            true,
+                            true);
+
+            steerCurrentLogger =
+                    new Logger<>(
+                            steer::getOutputCurrent,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/steerCurrent_amps",
+                            subdirName,
+                            true,
+                            true);
+
+            driveCurrentLogger =
+                    new Logger<>(
+                            drive::getOutputCurrent,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/driveCurrent_amps",
+                            subdirName,
+                            true,
+                            true);
+
+            steerAppliedVoltageLogger =
+                    new Logger<>(
+                            () -> steer.getAppliedOutput() * steer.getBusVoltage(),
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/steerAppliedVoltage_volts",
+                            subdirName,
+                            true,
+                            true);
+
+            driveAppliedVoltageLogger =
+                    new Logger<>(
+                            () -> drive.getAppliedOutput() * drive.getBusVoltage(),
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/driveAppliedVoltage_volts",
+                            subdirName,
+                            true,
+                            true);
+
+            steerBusVoltageLogger =
+                    new Logger<>(
+                            steer::getBusVoltage,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/steerBusVoltage_volts",
+                            subdirName,
+                            true,
+                            true);
+            driveBusVoltageLogger =
+                    new Logger<>(
+                            drive::getBusVoltage,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/driveBusVoltage_volts",
+                            subdirName,
+                            true,
+                            true);
+
+            steerTemperatureLogger =
+                    new Logger<>(
+                            steer::getMotorTemperature,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/steerTemperature_C",
+                            subdirName,
+                            true,
+                            true);
+            driveTemperatureLogger =
+                    new Logger<>(
+                            drive::getMotorTemperature,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/driveTemperature_C",
+                            subdirName,
+                            true,
+                            true);
+
+            unoffsetSteerLogger =
+                    new Logger<>(
+                            this::getUnoffsetSteerPositionRadians,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/unoffsetSteer_radians",
+                            subdirName,
+                            true,
+                            true);
+            steerLogger =
+                    new Logger<>(
+                            this::getSteerPositionRadians,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/steer_radians",
+                            subdirName,
+                            true,
+                            true);
+
+            drivePositionLogger =
+                    new Logger<>(
+                            this::getDriveAccumulationMeters,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/drivePosition_meters",
+                            subdirName,
+                            true,
+                            true);
+            driveVelocityLogger =
+                    new Logger<>(
+                            this::getDriveVelocityMetersPerSecond,
+                            HighLevelLogger.getInstance().getLog(),
+                            name + "/driveVelocity_meters_per_second",
+                            subdirName,
+                            true,
+                            true);
+        }
+
+        private MaxSwerveModule(
+                int driveCanId,
+                int steerCanId,
+                double offsetRadians,
+                boolean invertDrive,
+                String name) {
+            this(
+                    driveCanId,
+                    steerCanId,
+                    Gearing.L3,
+                    offsetRadians,
+                    Constants.DriveConstants.DRIVE_CURRENT_LIMIT_AMPS,
+                    Constants.DriveConstants.STEER_CURRENT_LIMIT_AMPS,
+                    invertDrive,
+                    name,
+                    "swerve");
+        }
+
+        public void setDriveControlInput(double volts) {
+            drive.setVoltage(
+                    UtilityMath.clamp(Constants.MiscConstants.saturationVoltage, volts)
+                            * (invertDrive ? -1 : 1));
+        }
+
+        public void setSteerControlInput(double volts) {
+            steer.setVoltage(-UtilityMath.clamp(Constants.MiscConstants.saturationVoltage, volts));
+            // drive motor inverted
+        }
+
+        public void setBrakeMode(boolean enabled) {
+            drive.setIdleMode(enabled ? IdleMode.kBrake : IdleMode.kCoast);
+            steer.setIdleMode(enabled ? IdleMode.kBrake : IdleMode.kCoast);
+
+            brakeModeEnabled = enabled;
+        }
+
+        public double getUnoffsetSteerPositionRadians() {
+            return steer.getAbsoluteEncoder(Type.kDutyCycle).getPosition();
+        }
+
+        public double getSteerPositionRadians() {
+            return UtilityMath.normalizeAngleRadians(
+                    getUnoffsetSteerPositionRadians() - offsetRadians);
+        }
+
+        public double getDriveAccumulationMeters() {
+            return driveRatio.ratio.inputFromOutput(drive.getEncoder().getPosition())
+                    * 2
+                    * Math.PI
+                    * Constants.DriveConstants.WHEEL_RADIUS_METERS
+                    * (invertDrive ? -1 : 1);
+            // apply gear ratio, convert rotations into radians, convert radians into linear
+            // distance
+        }
+
+        public double getDriveVelocityMetersPerSecond() {
+            return driveRatio.ratio.inputFromOutput(
+                            Units.rotationsPerMinuteToRadiansPerSecond(
+                                    drive.getEncoder().getVelocity()))
+                    * Constants.DriveConstants.WHEEL_RADIUS_METERS
+                    * (invertDrive ? -1 : 1);
+        }
+
+        public SwerveModulePosition getState() {
+            return new SwerveModulePosition(
+                    getDriveAccumulationMeters(), new Rotation2d(getSteerPositionRadians()));
+        }
+
+        private void updateLogs() {
+            brakeModeEnabledLogger.update();
+
+            steerCurrentLogger.update();
+            driveCurrentLogger.update();
+
+            steerAppliedVoltageLogger.update();
+            driveAppliedVoltageLogger.update();
+
+            steerBusVoltageLogger.update();
+            driveBusVoltageLogger.update();
+
+            steerTemperatureLogger.update();
+            driveTemperatureLogger.update();
+
+            unoffsetSteerLogger.update();
+            steerLogger.update();
+
+            drivePositionLogger.update();
+            driveVelocityLogger.update();
+        }
+    }
+
+    public record ModuleStates(
+            SwerveModulePosition frontLeft,
+            SwerveModulePosition frontRight,
+            SwerveModulePosition backRight,
+            SwerveModulePosition backLeft) {
+        /**
+         * Returns the module states in an array format. Order compatible with the Kinematics object
+         * in Constants.
+         *
+         * @return The module states as array.
+         */
+        public SwerveModulePosition[] asArray() {
+            return new SwerveModulePosition[] {frontLeft, frontRight, backRight, backLeft};
+        }
+    }
+    ;
+
+    public final MaxSwerveModule frontLeft =
+            new MaxSwerveModule(
+                    Constants.DriveConstants.FRONT_LEFT_DRIVE_CANID,
+                    Constants.DriveConstants.FRONT_LEFT_STEER_CANID,
+                    Constants.DriveConstants.FRONT_LEFT_OFFSET_RADIANS,
+                    false,
+                    "frontLeft");
+
+    public final MaxSwerveModule frontRight =
+            new MaxSwerveModule(
+                    Constants.DriveConstants.FRONT_RIGHT_DRIVE_CANID,
+                    Constants.DriveConstants.FRONT_RIGHT_STEER_CANID,
+                    Constants.DriveConstants.FRONT_RIGHT_OFFSET_RADIANS,
+                    false,
+                    "frontRight");
+
+    public final MaxSwerveModule backRight =
+            new MaxSwerveModule(
+                    Constants.DriveConstants.BACK_RIGHT_DRIVE_CANID,
+                    Constants.DriveConstants.BACK_RIGHT_STEER_CANID,
+                    Constants.DriveConstants.BACK_RIGHT_OFFSET_RADIANS,
+                    true,
+                    "backRight");
+
+    public final MaxSwerveModule backLeft =
+            new MaxSwerveModule(
+                    Constants.DriveConstants.BACK_LEFT_DRIVE_CANID,
+                    Constants.DriveConstants.BACK_LEFT_STEER_CANID,
+                    Constants.DriveConstants.BACK_LEFT_OFFSET_RADIANS,
+                    true,
+                    "backLeft");
+
+    public DriveSubsystem() {
+        register();
+    }
 
     @Override
     public void periodic() {
-        // Update the odometry in the periodic block
-        m_odometry.update(
-                Rotation2d.fromDegrees(m_gyro.getAngle()),
-                new SwerveModulePosition[] {
-                    m_frontLeft.getPosition(),
-                    m_frontRight.getPosition(),
-                    m_rearLeft.getPosition(),
-                    m_rearRight.getPosition()
-                });
+        frontLeft.updateLogs();
+        frontRight.updateLogs();
+        backLeft.updateLogs();
+        backRight.updateLogs();
     }
 
-    /**
-     * Returns the currently-estimated pose of the robot.
-     *
-     * @return The pose.
-     */
-    public Pose2d getPose() {
-        return m_odometry.getPoseMeters();
+    public ModuleStates getStates() {
+        return new ModuleStates(
+                frontLeft.getState(),
+                frontRight.getState(),
+                backRight.getState(),
+                backLeft.getState());
     }
 
-    /**
-     * Resets the odometry to the specified pose.
-     *
-     * @param pose The pose to which to set the odometry.
-     */
-    public void resetOdometry(Pose2d pose) {
-        m_odometry.resetPosition(
-                Rotation2d.fromDegrees(m_gyro.getAngle()),
-                new SwerveModulePosition[] {
-                    m_frontLeft.getPosition(),
-                    m_frontRight.getPosition(),
-                    m_rearLeft.getPosition(),
-                    m_rearRight.getPosition()
-                },
-                pose);
-    }
-
-    /**
-     * Method to drive the robot using joystick info.
-     *
-     * @param xSpeed Speed of the robot in the x direction (forward).
-     * @param ySpeed Speed of the robot in the y direction (sideways).
-     * @param rot Angular rate of the robot.
-     * @param fieldRelative Whether the provided x and y speeds are relative to the field.
-     * @param rateLimit Whether to enable rate limiting for smoother control.
-     */
-    public void drive(
-            double xSpeed, double ySpeed, double rot, boolean fieldRelative, boolean rateLimit) {
-
-        double xSpeedCommanded;
-        double ySpeedCommanded;
-
-        if (rateLimit) {
-            // Convert XY to polar for rate limiting
-            double inputTranslationDir = Math.atan2(ySpeed, xSpeed);
-            double inputTranslationMag = Math.sqrt(Math.pow(xSpeed, 2) + Math.pow(ySpeed, 2));
-
-            // Calculate the direction slew rate based on an estimate of the lateral acceleration
-            double directionSlewRate;
-            if (m_currentTranslationMag != 0.0) {
-                directionSlewRate =
-                        Math.abs(DriveConstants.kDirectionSlewRate / m_currentTranslationMag);
-            } else {
-                directionSlewRate =
-                        500.0; // some high number that means the slew rate is effectively
-                // instantaneous
-            }
-
-            double currentTime = WPIUtilJNI.now() * 1e-6;
-            double elapsedTime = currentTime - m_prevTime;
-            double angleDif =
-                    SwerveUtils.AngleDifference(inputTranslationDir, m_currentTranslationDir);
-            if (angleDif < 0.45 * Math.PI) {
-                m_currentTranslationDir =
-                        SwerveUtils.StepTowardsCircular(
-                                m_currentTranslationDir,
-                                inputTranslationDir,
-                                directionSlewRate * elapsedTime);
-                m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
-            } else if (angleDif > 0.85 * Math.PI) {
-                if (m_currentTranslationMag
-                        > 1e-4) { // some small number to avoid floating-point errors with equality
-                    // checking
-                    // keep currentTranslationDir unchanged
-                    m_currentTranslationMag = m_magLimiter.calculate(0.0);
-                } else {
-                    m_currentTranslationDir =
-                            SwerveUtils.WrapAngle(m_currentTranslationDir + Math.PI);
-                    m_currentTranslationMag = m_magLimiter.calculate(inputTranslationMag);
-                }
-            } else {
-                m_currentTranslationDir =
-                        SwerveUtils.StepTowardsCircular(
-                                m_currentTranslationDir,
-                                inputTranslationDir,
-                                directionSlewRate * elapsedTime);
-                m_currentTranslationMag = m_magLimiter.calculate(0.0);
-            }
-            m_prevTime = currentTime;
-
-            xSpeedCommanded = m_currentTranslationMag * Math.cos(m_currentTranslationDir);
-            ySpeedCommanded = m_currentTranslationMag * Math.sin(m_currentTranslationDir);
-            m_currentRotation = m_rotLimiter.calculate(rot);
-
-        } else {
-            xSpeedCommanded = xSpeed;
-            ySpeedCommanded = ySpeed;
-            m_currentRotation = rot;
-        }
-
-        // Convert the commanded speeds into the correct units for the drivetrain
-        double xSpeedDelivered = xSpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-        double ySpeedDelivered = ySpeedCommanded * DriveConstants.kMaxSpeedMetersPerSecond;
-        double rotDelivered = m_currentRotation * DriveConstants.kMaxAngularSpeed;
-
-        var swerveModuleStates =
-                DriveConstants.kDriveKinematics.toSwerveModuleStates(
-                        fieldRelative
-                                ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                                        xSpeedDelivered,
-                                        ySpeedDelivered,
-                                        rotDelivered,
-                                        Rotation2d.fromDegrees(m_gyro.getAngle()))
-                                : new ChassisSpeeds(
-                                        xSpeedDelivered, ySpeedDelivered, rotDelivered));
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-                swerveModuleStates, DriveConstants.kMaxSpeedMetersPerSecond);
-        m_frontLeft.setDesiredState(swerveModuleStates[0]);
-        m_frontRight.setDesiredState(swerveModuleStates[1]);
-        m_rearLeft.setDesiredState(swerveModuleStates[2]);
-        m_rearRight.setDesiredState(swerveModuleStates[3]);
-    }
-
-    /** Sets the wheels into an X formation to prevent movement. */
-    public void setX() {
-        m_frontLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-        m_frontRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        m_rearLeft.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(-45)));
-        m_rearRight.setDesiredState(new SwerveModuleState(0, Rotation2d.fromDegrees(45)));
-    }
-
-    /**
-     * Sets the swerve ModuleStates.
-     *
-     * @param desiredStates The desired SwerveModule states.
-     */
-    public void setModuleStates(SwerveModuleState[] desiredStates) {
-        SwerveDriveKinematics.desaturateWheelSpeeds(
-                desiredStates, DriveConstants.kMaxSpeedMetersPerSecond);
-        m_frontLeft.setDesiredState(desiredStates[0]);
-        m_frontRight.setDesiredState(desiredStates[1]);
-        m_rearLeft.setDesiredState(desiredStates[2]);
-        m_rearRight.setDesiredState(desiredStates[3]);
-    }
-
-    /** Resets the drive encoders to currently read a position of 0. */
-    public void resetEncoders() {
-        m_frontLeft.resetEncoders();
-        m_rearLeft.resetEncoders();
-        m_frontRight.resetEncoders();
-        m_rearRight.resetEncoders();
-    }
-
-    /** Zeroes the heading of the robot. */
-    public void zeroHeading() {
-        m_gyro.reset();
-    }
-
-    /**
-     * Returns the heading of the robot.
-     *
-     * @return the robot's heading in degrees, from -180 to 180
-     */
-    public double getHeading() {
-        return Rotation2d.fromDegrees(m_gyro.getAngle()).getDegrees();
-    }
-
-    /**
-     * Returns the turn rate of the robot.
-     *
-     * @return The turn rate of the robot, in degrees per second
-     */
-    public double getTurnRate() {
-        return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
+    public Command setBrakeModeCommand(boolean enabled) {
+        return Commands.runOnce(
+                        () -> {
+                            for (MaxSwerveModule module :
+                                    new MaxSwerveModule[] {
+                                        frontLeft, frontRight, backRight, backLeft
+                                    }) module.setBrakeMode(enabled);
+                        })
+                .ignoringDisable(true);
     }
 }

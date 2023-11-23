@@ -23,27 +23,21 @@ import frc.robot.Constants.IntakeConstants;
 
 public class IntakeSubsystem extends SubsystemBase {
 
-    // TODO: add subsystem dependencies
     private final TalonSRX motor;
     private final DigitalInput input =
             new DigitalInput(Constants.IntakeConstants.BREAKBEAM_DIO_PORT);
 
     public IntakeSubsystem() {
         motor = new TalonSRX(IntakeConstants.CAN_ID);
+        motor.configFactoryDefault();
+        // motor.configVoltageCompSaturation(IntakeConstants.VOLTAGE_LIMIT);
+        motor.configPeakCurrentLimit(IntakeConstants.CURRENT_LIMIT);
     }
 
     public boolean isBeamBroken() {
         return (Constants.IntakeConstants.BREAKBEAM_TRUE_WHEN_OCCLUDED)
                 ? input.get()
                 : !input.get();
-    }
-
-    public void periodic() {
-        // TODO: define periodic behavior of the subsystem.
-    }
-
-    public void simulationPeriodic() {
-        // TODO: define periodic behavior of the subsystem in a simulation.
     }
 
     public void setVoltage(double voltage) {

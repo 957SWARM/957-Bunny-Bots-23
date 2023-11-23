@@ -3,10 +3,11 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
-import com.team957.lib.math.filters.ExponentialMovingAverage;
+import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
+import frc.robot.microsystems.UI;
 
 /*
  * See the following wiki pages:
@@ -26,7 +27,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     private final CANSparkMax motor;
     private final Encoder encoder;
-    private ExponentialMovingAverage average;
+    private LinearFilter filter;
+    private double filterOutput;
 
     public ShooterSubsystem() {
         motor = new CANSparkMax(ShooterConstants.CAN_ID, MotorType.kBrushless);
@@ -37,23 +39,22 @@ public class ShooterSubsystem extends SubsystemBase {
 
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kCoast);
+        motor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT);
+        filter = LinearFilter.highPass(.1, .02);
     }
 
     public double getRPM() {
         return (encoder.getRate() / 2048.0) / 4.0;
     }
 
-    public boolean aboveThreshold(double average, double threshold) {
-        return average > threshold;
+    public boolean aboveThreshold(double threshold) {
+        return filterOutput > threshold;
     }
 
     public void periodic() {
-        // TODO: define periodic behavior of the subsystem.
-        average.calculate(motor.getOutputCurrent());
-    }
+        filterOutput = filter.calculate(motor.getOutputCurrent());
 
-    public void simulationPeriodic() {
-        // TODO: define periodic behavior of the subsystem in a simulation.
+        UI.getInstance().setShooterSpeed(encoder.getRate() / 2048 / 40);
     }
 
     public void setVoltage(double volts) {
