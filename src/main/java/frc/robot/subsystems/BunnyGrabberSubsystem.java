@@ -3,7 +3,7 @@ package frc.robot.subsystems;
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 import frc.robot.microsystems.UI;
@@ -22,15 +22,15 @@ public class BunnyGrabberSubsystem extends SubsystemBase {
         piston.set(Value.kReverse);
     }
 
-    public CommandBase extendBunnyGrabber() {
+    public Command extendBunnyGrabber() {
         return this.runOnce(() -> piston.set(Value.kForward));
     }
 
-    public CommandBase retractBunnyGrabber() {
+    public Command retractBunnyGrabber() {
         return this.runOnce(() -> piston.set(Value.kReverse));
     }
 
-    public CommandBase toggleBunnyGrabber() {
+    public Command toggleBunnyGrabber() {
         return this.runOnce(() -> piston.toggle());
     }
 

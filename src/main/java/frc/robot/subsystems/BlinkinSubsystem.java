@@ -4,7 +4,7 @@ Time to Blink all over the place!*/
 package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.BlinkinConstants;
 
@@ -18,34 +18,34 @@ public class BlinkinSubsystem extends SubsystemBase {
     }
 
     // No balls
-    public CommandBase green() {
+    public Command green() {
         return this.runOnce(() -> motor.set(BlinkinConstants.GREEN));
     }
 
     // Full balls
-    public CommandBase red() {
+    public Command red() {
 
         return this.runOnce(() -> motor.set(BlinkinConstants.RED));
     }
 
     // 1-2 Balls
-    public CommandBase gold() {
+    public Command gold() {
 
         return this.runOnce(() -> motor.set(BlinkinConstants.GOLD));
     }
 
     // 3-4 Balls
-    public CommandBase redOrange() {
+    public Command redOrange() {
 
         return this.runOnce(() -> motor.set(BlinkinConstants.REDORANGE));
     }
 
-    public CommandBase automation() {
+    public Command automation() {
 
         return this.runOnce(() -> motor.set(BlinkinConstants.AUTOMATION));
     }
 
-    public CommandBase secondAutomation() {
+    public Command secondAutomation() {
 
         return this.runOnce(() -> motor.set(BlinkinConstants.SECOND_AUTOMATION));
     }

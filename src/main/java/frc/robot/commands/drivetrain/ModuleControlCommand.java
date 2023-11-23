@@ -5,14 +5,14 @@ import com.team957.lib.util.DeltaTimeUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DriveSubsystem.MaxSwerveModule;
 import java.util.function.Supplier;
 
 /** Command for direct control of module states. */
-public class ModuleControlCommand extends CommandBase {
+public class ModuleControlCommand extends Command {
     private class ModuleContainer {
         final Supplier<SwerveModuleState> setpoint;
 

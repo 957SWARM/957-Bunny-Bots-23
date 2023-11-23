@@ -1,10 +1,10 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.IntakeSubsystem;
 import java.util.function.DoubleSupplier;
 
-public class IntakeControlCommand extends CommandBase {
+public class IntakeControlCommand extends Command {
     private final IntakeSubsystem intake;
     private final DoubleSupplier intakeVoltage;
 

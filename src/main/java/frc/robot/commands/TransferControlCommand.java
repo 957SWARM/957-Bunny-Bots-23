@@ -1,12 +1,12 @@
 package frc.robot.commands;
 
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.TransferConstants;
 import frc.robot.subsystems.TransferSubsystem;
 import java.util.function.BooleanSupplier;
 import java.util.function.DoubleSupplier;
 
-public class TransferControlCommand extends CommandBase {
+public class TransferControlCommand extends Command {
     private final TransferSubsystem transfer;
     private final BooleanSupplier enableTransfer;
     private final DoubleSupplier currentShooterRPM;
