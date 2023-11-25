@@ -20,16 +20,21 @@ import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.peripherals.IMU;
-import frc.robot.peripherals.IntakeStates;
-import frc.robot.peripherals.RobotState;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
+import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
 
 public class RobotContainer {
+    public static enum RobotState {
+        IDLE,
+        EJECT,
+        INTAKE,
+        SHOOT;
+    }
 
     // Controllers
     DriverInput driver = new DefaultDriver(0);
