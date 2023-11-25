@@ -24,9 +24,9 @@ import frc.robot.peripherals.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
+import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
-import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
 
 public class RobotContainer {
     public static enum RobotState {
