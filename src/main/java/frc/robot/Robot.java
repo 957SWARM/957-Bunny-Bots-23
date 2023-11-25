@@ -4,8 +4,6 @@
 
 package frc.robot;
 
-import com.team957.lib.telemetry.BaseHardwareLogger;
-import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
@@ -15,6 +13,8 @@ import frc.robot.input.DriverInput;
 import frc.robot.microsystems.IMU;
 import frc.robot.microsystems.UI;
 import frc.robot.subsystems.DriveSubsystem;
+import monologue.Logged;
+import monologue.Monologue;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -22,7 +22,7 @@ import frc.robot.subsystems.DriveSubsystem;
  * the package after creating this project, you must also update the build.gradle file in the
  * project.
  */
-public class Robot extends TimedRobot {
+public class Robot extends TimedRobot implements Logged {
     private Command m_autonomousCommand;
 
     private RobotContainer m_robotContainer;
@@ -42,10 +42,7 @@ public class Robot extends TimedRobot {
         // autonomous chooser on the dashboard.
         m_robotContainer = new RobotContainer();
 
-        HighLevelLogger.getInstance().startLogging();
-        HighLevelLogger.getInstance().autoGenerateLogs("highLevel", "base");
-
-        BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
+        Monologue.setupLogging(this, "/Monologue");
     }
 
     /**
@@ -64,15 +61,14 @@ public class Robot extends TimedRobot {
         CommandScheduler.getInstance().run();
         m_robotContainer.stateMachinePeriodic();
 
-        HighLevelLogger.getInstance().updateLogs();
-        BaseHardwareLogger.getInstance().updateLogs();
-
         ui.periodic();
         timerControllerUpdate += .02;
         if (timerControllerUpdate >= 1) {
             m_robotContainer.updateControllers();
             timerControllerUpdate = 0;
         }
+
+        Monologue.update();
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

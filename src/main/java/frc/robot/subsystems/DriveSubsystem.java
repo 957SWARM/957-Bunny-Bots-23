@@ -9,8 +9,6 @@ import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 import com.team957.lib.math.UtilityMath;
-import com.team957.lib.telemetry.HighLevelLogger;
-import com.team957.lib.telemetry.Logger;
 import com.team957.lib.util.GearRatioHelper;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -19,31 +17,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.Subsystem;
 import frc.robot.Constants;
+import monologue.Logged;
+import monologue.Monologue.LogBoth;
 
-public class DriveSubsystem implements Subsystem {
-    public class MaxSwerveModule {
-        private final Logger<Boolean> brakeModeEnabledLogger;
-
-        private final Logger<Double> steerCurrentLogger;
-        private Logger<Double> driveCurrentLogger;
-
-        private final Logger<Double> steerAppliedVoltageLogger;
-        private final Logger<Double> driveAppliedVoltageLogger;
-
-        private final Logger<Double> steerBusVoltageLogger;
-        private final Logger<Double> driveBusVoltageLogger;
-
-        private final Logger<Double> steerTemperatureLogger;
-        private final Logger<Double> driveTemperatureLogger;
-
-        private final Logger<Double> unoffsetSteerLogger;
-        private final Logger<Double> steerLogger;
-
-        private final Logger<Double> drivePositionLogger;
-        private final Logger<Double> driveVelocityLogger;
-
-        private boolean brakeModeEnabled = false;
-
+public class DriveSubsystem implements Subsystem, Logged {
+    public class MaxSwerveModule implements Logged {
         private enum Gearing {
             L1(new GearRatioHelper(5.5)),
             L2(new GearRatioHelper(5.08)),
@@ -63,6 +41,9 @@ public class DriveSubsystem implements Subsystem {
         private final double offsetRadians;
 
         private final boolean invertDrive;
+
+        @LogBoth
+        private boolean brakeModeEnabled = false;
 
         private MaxSwerveModule(
                 int driveCanId,
@@ -88,119 +69,6 @@ public class DriveSubsystem implements Subsystem {
             setBrakeMode(Constants.DriveConstants.DEFAULT_BRAKE_MODE_ENABLED);
 
             this.invertDrive = invertDrive;
-
-            brakeModeEnabledLogger =
-                    new Logger<>(
-                            () -> brakeModeEnabled,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/brakeModeEnabled",
-                            subdirName,
-                            true,
-                            true);
-
-            steerCurrentLogger =
-                    new Logger<>(
-                            steer::getOutputCurrent,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/steerCurrent_amps",
-                            subdirName,
-                            true,
-                            true);
-
-            driveCurrentLogger =
-                    new Logger<>(
-                            drive::getOutputCurrent,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/driveCurrent_amps",
-                            subdirName,
-                            true,
-                            true);
-
-            steerAppliedVoltageLogger =
-                    new Logger<>(
-                            () -> steer.getAppliedOutput() * steer.getBusVoltage(),
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/steerAppliedVoltage_volts",
-                            subdirName,
-                            true,
-                            true);
-
-            driveAppliedVoltageLogger =
-                    new Logger<>(
-                            () -> drive.getAppliedOutput() * drive.getBusVoltage(),
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/driveAppliedVoltage_volts",
-                            subdirName,
-                            true,
-                            true);
-
-            steerBusVoltageLogger =
-                    new Logger<>(
-                            steer::getBusVoltage,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/steerBusVoltage_volts",
-                            subdirName,
-                            true,
-                            true);
-            driveBusVoltageLogger =
-                    new Logger<>(
-                            drive::getBusVoltage,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/driveBusVoltage_volts",
-                            subdirName,
-                            true,
-                            true);
-
-            steerTemperatureLogger =
-                    new Logger<>(
-                            steer::getMotorTemperature,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/steerTemperature_C",
-                            subdirName,
-                            true,
-                            true);
-            driveTemperatureLogger =
-                    new Logger<>(
-                            drive::getMotorTemperature,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/driveTemperature_C",
-                            subdirName,
-                            true,
-                            true);
-
-            unoffsetSteerLogger =
-                    new Logger<>(
-                            this::getUnoffsetSteerPositionRadians,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/unoffsetSteer_radians",
-                            subdirName,
-                            true,
-                            true);
-            steerLogger =
-                    new Logger<>(
-                            this::getSteerPositionRadians,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/steer_radians",
-                            subdirName,
-                            true,
-                            true);
-
-            drivePositionLogger =
-                    new Logger<>(
-                            this::getDriveAccumulationMeters,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/drivePosition_meters",
-                            subdirName,
-                            true,
-                            true);
-            driveVelocityLogger =
-                    new Logger<>(
-                            this::getDriveVelocityMetersPerSecond,
-                            HighLevelLogger.getInstance().getLog(),
-                            name + "/driveVelocity_meters_per_second",
-                            subdirName,
-                            true,
-                            true);
         }
 
         private MaxSwerveModule(
@@ -239,15 +107,18 @@ public class DriveSubsystem implements Subsystem {
             brakeModeEnabled = enabled;
         }
 
+        @LogBoth
         public double getUnoffsetSteerPositionRadians() {
             return steer.getAbsoluteEncoder(Type.kDutyCycle).getPosition();
         }
 
+        @LogBoth
         public double getSteerPositionRadians() {
             return UtilityMath.normalizeAngleRadians(
                     getUnoffsetSteerPositionRadians() - offsetRadians);
         }
 
+        @LogBoth
         public double getDriveAccumulationMeters() {
             return driveRatio.ratio.inputFromOutput(drive.getEncoder().getPosition())
                     * 2
@@ -258,6 +129,7 @@ public class DriveSubsystem implements Subsystem {
             // distance
         }
 
+        @LogBoth
         public double getDriveVelocityMetersPerSecond() {
             return driveRatio.ratio.inputFromOutput(
                             Units.rotationsPerMinuteToRadiansPerSecond(
@@ -266,31 +138,40 @@ public class DriveSubsystem implements Subsystem {
                     * (invertDrive ? -1 : 1);
         }
 
+        @LogBoth
         public SwerveModulePosition getState() {
             return new SwerveModulePosition(
                     getDriveAccumulationMeters(), new Rotation2d(getSteerPositionRadians()));
         }
 
-        private void updateLogs() {
-            brakeModeEnabledLogger.update();
+        @LogBoth
+        public double getDriveCurrentAmps() {
+                return drive.getOutputCurrent();
+        }
 
-            steerCurrentLogger.update();
-            driveCurrentLogger.update();
+        @LogBoth
+        public double getSteerCurrentAmps() {
+                return steer.getOutputCurrent();
+        }
 
-            steerAppliedVoltageLogger.update();
-            driveAppliedVoltageLogger.update();
+        @LogBoth
+        public double getDriveControlEffortVolts() {
+                return drive.getAppliedOutput() * drive.getBusVoltage();
+        }
 
-            steerBusVoltageLogger.update();
-            driveBusVoltageLogger.update();
+        @LogBoth
+        public double getSteerControlEffortVolts() {
+                return steer.getAppliedOutput() * steer.getBusVoltage();
+        }
 
-            steerTemperatureLogger.update();
-            driveTemperatureLogger.update();
+        @LogBoth
+        public double getDriveTemperatureC() {
+                return drive.getMotorTemperature();
+        }
 
-            unoffsetSteerLogger.update();
-            steerLogger.update();
-
-            drivePositionLogger.update();
-            driveVelocityLogger.update();
+        @LogBoth
+        public double getSteerTemperatureC() {
+                return steer.getMotorTemperature();
         }
     }
 
@@ -345,14 +226,6 @@ public class DriveSubsystem implements Subsystem {
 
     public DriveSubsystem() {
         register();
-    }
-
-    @Override
-    public void periodic() {
-        frontLeft.updateLogs();
-        frontRight.updateLogs();
-        backLeft.updateLogs();
-        backRight.updateLogs();
     }
 
     public ModuleStates getStates() {

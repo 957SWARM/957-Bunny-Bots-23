@@ -41,6 +41,7 @@ repositories {
 
 dependencies {
 	implementation 'com.github.957SWARM:SwarmLib:1.4.2'
+	implementation 'com.github.shueja:Monologue:v1.0.0-alpha2'
 }
 
 // Define my targets (RoboRIO) and artifacts (deployable files)
