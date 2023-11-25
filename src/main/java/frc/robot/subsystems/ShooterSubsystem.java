@@ -7,7 +7,7 @@ import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.microsystems.UI;
+import frc.robot.peripherals.UI;
 
 /*
  * See the following wiki pages:

@@ -1,4 +1,4 @@
-package frc.robot.microsystems;
+package frc.robot.peripherals;
 
 public enum RobotState {
     IDLE,
