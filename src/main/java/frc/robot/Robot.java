@@ -4,15 +4,22 @@
 
 package frc.robot;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.PathPlannerTrajectory;
 import com.team957.lib.telemetry.BaseHardwareLogger;
 import com.team957.lib.telemetry.HighLevelLogger;
+import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
 import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
+import frc.robot.commands.drivetrain.PathFollowCommands;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DriverInput;
 import frc.robot.peripherals.IMU;
+import frc.robot.peripherals.PoseEstimation;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -31,6 +38,9 @@ public class Robot extends TimedRobot {
 
     private final DriverInput driver = new DefaultDriver(0);
     private final DriveSubsystem drive = new DriveSubsystem();
+
+    private final PoseEstimation odom =
+            new PoseEstimation(drive::getStates, IMU.instance::getCorrectedAngle, new Pose2d());
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -69,6 +79,8 @@ public class Robot extends TimedRobot {
         HighLevelLogger.getInstance().updateLogs();
         BaseHardwareLogger.getInstance().updateLogs();
 
+        odom.update();
+
         ui.periodic();
         timerControllerUpdate += .02;
         if (timerControllerUpdate >= 1) {
@@ -89,12 +101,19 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-        // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        PathPlannerTrajectory path =
+                PathPlanner.loadPath("New Path.path", new PathConstraints(1, 1));
 
-        // schedule the autonomous command (example)
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
-        }
+        CommandScheduler.getInstance()
+                .schedule(
+                        Commands.runOnce(
+                                        () -> {
+                                            odom.overridePose(path.getInitialHolonomicPose());
+                                        })
+                                .andThen(
+                                        PathFollowCommands.getPathFollowCommand(
+                                                drive, odom::getPoseEstimate, path)));
+        // TODO implement chooser
     }
 
     /** This function is called periodically during autonomous. */

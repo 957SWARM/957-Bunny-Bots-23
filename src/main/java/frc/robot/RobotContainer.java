@@ -4,12 +4,8 @@
 
 package frc.robot;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
-import com.pathplanner.lib.PathPlannerTrajectory;
 import com.team957.lib.util.DeltaTimeUtil;
 import edu.wpi.first.math.filter.Debouncer;
-import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.BallPathConstants;
@@ -18,17 +14,14 @@ import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.ShooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
-import frc.robot.commands.drivetrain.PathFollowCommands;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.peripherals.IMU;
-import frc.robot.peripherals.PoseEstimation;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
-import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -261,20 +254,6 @@ public class RobotContainer {
 
         // pushes ball count to dashboard
         UI.getInstance().setBallCount(ballCount);
-    }
-
-    public Command getAutonomousCommand(DriveSubsystem drive, PoseEstimation poseEstimation) {
-        PathPlannerTrajectory path =
-                PathPlanner.loadPath("New Path.path", new PathConstraints(1, 1));
-
-        return Commands.runOnce(
-                        () -> {
-                            poseEstimation.overridePose(path.getInitialHolonomicPose());
-                        })
-                .andThen(
-                        PathFollowCommands.getPathFollowCommand(
-                                drive, poseEstimation::getPoseEstimate, path));
-        // TODO implement chooser
     }
 
     public void updateControllers() {

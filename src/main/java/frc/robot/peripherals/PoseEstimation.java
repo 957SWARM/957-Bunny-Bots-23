@@ -1,5 +1,7 @@
 package frc.robot.peripherals;
 
+import com.team957.lib.telemetry.HighLevelLogger;
+import com.team957.lib.telemetry.Logger;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
@@ -12,6 +14,15 @@ public class PoseEstimation {
     private final Supplier<Rotation2d> rotation;
 
     private final SwerveDriveOdometry odometry;
+
+    private final Logger<Pose2d> poseEstimateLogger =
+            new Logger<>(
+                    this::getPoseEstimate,
+                    HighLevelLogger.getInstance().getLog(),
+                    "poseEstimateMeters",
+                    "poseEstimation",
+                    true,
+                    true);
 
     public PoseEstimation(
             Supplier<ModuleStates> swerveModuleStates,
@@ -30,6 +41,8 @@ public class PoseEstimation {
 
     public void update() {
         odometry.update(rotation.get(), swerveModuleStates.get().asArray());
+
+        poseEstimateLogger.update();
     }
 
     public Pose2d getPoseEstimate() {
