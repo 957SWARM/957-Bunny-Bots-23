@@ -12,8 +12,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DriverInput;
-import frc.robot.microsystems.IMU;
-import frc.robot.microsystems.UI;
+import frc.robot.peripherals.IMU;
+import frc.robot.peripherals.UI;
 import frc.robot.subsystems.DriveSubsystem;
 
 /**
