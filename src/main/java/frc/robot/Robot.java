@@ -46,6 +46,8 @@ public class Robot extends TimedRobot {
         HighLevelLogger.getInstance().autoGenerateLogs("highLevel", "base");
 
         BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
+
+        IMU.instance.setAngleToZero();
     }
 
     /**
@@ -108,8 +110,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-
-        IMU.instance.setAngleToZero();
 
         // temporary workaround for commandscheduler requirements issues
         CommandScheduler.getInstance()

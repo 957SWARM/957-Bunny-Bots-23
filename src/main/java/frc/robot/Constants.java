@@ -29,7 +29,7 @@ public class Constants {
                         BACK_LEFT_TRANSFORM);
 
         public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(2.5, 0, 0);
-        public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(2, 10, 0);
+        public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(1, 7.5, 0);
 
         // look into feedforward again
         public static final double DRIVE_FEEDFORWARD_KS_VOLTS = 0;
