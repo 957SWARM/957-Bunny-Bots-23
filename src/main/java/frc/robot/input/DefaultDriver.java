@@ -30,7 +30,7 @@ public class DefaultDriver implements DriverInput {
     }
 
     public double swerveRot() {
-        return ROT_MAX_SPEED * xboxController.getRightX();
+        return -ROT_MAX_SPEED * xboxController.getRightX();
     }
 
     public boolean toggleGrabber() {

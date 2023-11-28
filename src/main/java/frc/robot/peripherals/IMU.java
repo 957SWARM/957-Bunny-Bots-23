@@ -1,4 +1,4 @@
-package frc.robot.microsystems;
+package frc.robot.peripherals;
 
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.geometry.Rotation2d;

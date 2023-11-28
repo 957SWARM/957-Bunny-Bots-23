@@ -5,16 +5,14 @@ import com.team957.lib.util.DeltaTimeUtil;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.DriveSubsystem.MaxSwerveModule;
-import java.util.Set;
 import java.util.function.Supplier;
 
 /** Command for direct control of module states. */
-public class ModuleControlCommand implements Command {
+public class ModuleControlCommand extends CommandBase {
     private class ModuleContainer {
         final Supplier<SwerveModuleState> setpoint;
 
@@ -53,8 +51,6 @@ public class ModuleControlCommand implements Command {
 
     private final DeltaTimeUtil dtUtil;
 
-    private final DriveSubsystem drive;
-
     public ModuleControlCommand(
             DriveSubsystem drive, Supplier<CombinedModuleSetpoints> moduleSetpoints) {
         this.frontRight =
@@ -67,11 +63,7 @@ public class ModuleControlCommand implements Command {
 
         this.dtUtil = new DeltaTimeUtil();
 
-        this.drive = drive;
-    }
-
-    public Set<Subsystem> getRequirements() {
-        return Set.of(drive);
+        addRequirements(drive);
     }
 
     @Override

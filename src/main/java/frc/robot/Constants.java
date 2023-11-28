@@ -28,7 +28,7 @@ public class Constants {
                         BACK_LEFT_TRANSFORM);
 
         public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(2.5, 0, 0);
-        public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(2, 10, 0);
+        public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(1, 7.5, 0);
 
         // look into feedforward again
         public static final double DRIVE_FEEDFORWARD_KS_VOLTS = 0;
@@ -52,7 +52,7 @@ public class Constants {
         // the offset is the "raw" value reported when the module is at the "zero" position
 
         // last updated: November 15 8:30 PM
-        public static final double FRONT_LEFT_OFFSET_RADIANS = -(Math.PI / 2);
+        public static final double FRONT_LEFT_OFFSET_RADIANS = 2.62 - (Math.PI / 2);
         public static final double FRONT_RIGHT_OFFSET_RADIANS = 0;
         public static final double BACK_RIGHT_OFFSET_RADIANS = -(Math.PI / 2);
         public static final double BACK_LEFT_OFFSET_RADIANS = 0;
@@ -128,7 +128,6 @@ public class Constants {
     }
 
     public static final class BunnyGrabberConstants {
-        public static final int MODULE_PORT = 14;
         public static final int FORWARD_PORT = 0;
         public static final int REVERSE_PORT = 1;
     }
@@ -158,7 +157,7 @@ public class Constants {
         // this is for the angular rate
     }
 
-    public static final class RobotConstants {
+    public static final class PDHConstants {
         public static final int PDH_CAN_ID = 30;
         public static final int PCH_CAN_ID = 31;
     }
@@ -167,5 +166,11 @@ public class Constants {
         public static final PIDConstants LINEAR_CASCADE_CONSTANTS = new PIDConstants(0, 0, 0);
 
         public static final PIDConstants ANGULAR_CASCADE_CONSTANTS = new PIDConstants(0, 0, 0);
+    }
+
+    public static final class PneumaticHubConstants {
+        public static final int PH_CAN_ID = 31;
+
+        public static final int PRESSURE_SENSOR_ANALOG_CHANNEL = 0;
     }
 }
