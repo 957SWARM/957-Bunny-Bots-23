@@ -3,13 +3,11 @@ package frc.robot.commands.drivetrain;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj2.command.ProxyCommand;
 import frc.robot.Constants;
-import frc.robot.commands.drivetrain.ModuleControlCommand.CombinedModuleSetpoints;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.function.DoubleSupplier;
 
-public class ChassisControlCommand extends ProxyCommand {
+public class ChassisControlCommand extends ModuleControlCommand {
     /**
      * Constructs a ChassisControlCommand.
      *
@@ -24,22 +22,19 @@ public class ChassisControlCommand extends ProxyCommand {
             DoubleSupplier chassisRelativeYVelocity,
             DoubleSupplier angularVelocity) {
         super(
-                new ModuleControlCommand(
-                        drive,
-                        () -> {
-                            SwerveModuleState[] states =
-                                    Constants.DriveConstants.KINEMATICS.toSwerveModuleStates(
-                                            new ChassisSpeeds(
-                                                    chassisRelativeXVelocity.getAsDouble(),
-                                                    chassisRelativeYVelocity.getAsDouble(),
-                                                    angularVelocity.getAsDouble()));
+                drive,
+                () -> {
+                    SwerveModuleState[] states =
+                            Constants.DriveConstants.KINEMATICS.toSwerveModuleStates(
+                                    new ChassisSpeeds(
+                                            chassisRelativeXVelocity.getAsDouble(),
+                                            chassisRelativeYVelocity.getAsDouble(),
+                                            angularVelocity.getAsDouble()));
 
-                            SwerveDriveKinematics.desaturateWheelSpeeds(
-                                    states,
-                                    Constants.DriveConstants.WHEEL_MAX_SPEED_METERS_PER_SECOND);
+                    SwerveDriveKinematics.desaturateWheelSpeeds(
+                            states, Constants.DriveConstants.WHEEL_MAX_SPEED_METERS_PER_SECOND);
 
-                            return new CombinedModuleSetpoints(
-                                    states[1], states[2], states[3], states[0]);
-                        }));
+                    return new CombinedModuleSetpoints(states[1], states[2], states[3], states[0]);
+                });
     }
 }
