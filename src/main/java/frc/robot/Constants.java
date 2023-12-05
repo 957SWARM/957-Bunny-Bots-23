@@ -135,8 +135,10 @@ public class Constants {
     }
 
     public static final class VisionTargetingConstants {
-        // radians per second per error unit (pixels?)
-        public static final double TARGETING_KP = 0.0;
+        // radians per second per radians
+        public static final double TARGETING_KP = 1;
+        public static final double TARGETING_KI = 0;
+        public static final double TARGETING_KD = 0;
 
         // this is just kP because:
         // 1: this is for a second-order cascaded controller

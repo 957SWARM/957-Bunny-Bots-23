@@ -49,6 +49,9 @@ public final class Limelight {
     // Angle off from target horizontally
     public double getTx() {
         double x = xSub.get();
+        if (Math.abs(x) > 35) {
+            return 0;
+        }
         return x;
     }
 

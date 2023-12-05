@@ -9,10 +9,14 @@ import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
+import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.commands.BasicVisionTargetingCommands;
 import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DriverInput;
 import frc.robot.peripherals.IMU;
+import frc.robot.peripherals.Limelight;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -32,6 +36,8 @@ public class Robot extends TimedRobot {
     private final DriverInput driver = new DefaultDriver(0);
     private final DriveSubsystem drive = new DriveSubsystem();
 
+    Trigger visionTrigger;
+
     /**
      * This function is run when the robot is first started up and should be used for any
      * initialization code.
@@ -48,6 +54,21 @@ public class Robot extends TimedRobot {
         BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
 
         IMU.instance.setAngleToZero();
+
+        visionTrigger =
+                new Trigger(() -> driver.visionTargeting())
+                        .toggleOnTrue(
+                                BasicVisionTargetingCommands.getBasicVisionTargeting(
+                                                drive, Limelight.getInstance()::getTx)
+                                        .alongWith(
+                                                Commands.run(
+                                                        () ->
+                                                                System.out.println(
+                                                                        Limelight.getInstance()
+                                                                                        .getTx()
+                                                                                + Limelight
+                                                                                        .getInstance()
+                                                                                        .getTv()))));
     }
 
     /**
@@ -112,14 +133,13 @@ public class Robot extends TimedRobot {
         }
 
         // temporary workaround for commandscheduler requirements issues
-        CommandScheduler.getInstance()
-                .schedule(
-                        new FieldRelativeControlCommand(
-                                drive,
-                                IMU.instance::getCorrectedAngle,
-                                driver::swerveX,
-                                driver::swerveY,
-                                driver::swerveRot));
+        drive.setDefaultCommand(
+                new FieldRelativeControlCommand(
+                        drive,
+                        IMU.instance::getCorrectedAngle,
+                        driver::swerveX,
+                        driver::swerveY,
+                        driver::swerveRot));
     }
 
     /** This function is called periodically during operator control. */

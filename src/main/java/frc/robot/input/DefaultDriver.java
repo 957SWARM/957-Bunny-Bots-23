@@ -54,7 +54,7 @@ public class DefaultDriver implements DriverInput {
     }
 
     public boolean visionTargeting() {
-        return xboxController.b().getAsBoolean();
+        return xboxController.rightBumper().getAsBoolean();
     }
 
     public boolean increaseBallCount() {
