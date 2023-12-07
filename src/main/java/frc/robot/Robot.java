@@ -12,6 +12,7 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.commands.BasicVisionTargetingCommands;
+import frc.robot.commands.drivetrain.ChassisControlCommand;
 import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DriverInput;
@@ -134,9 +135,8 @@ public class Robot extends TimedRobot {
 
         // temporary workaround for commandscheduler requirements issues
         drive.setDefaultCommand(
-                new FieldRelativeControlCommand(
+                new ChassisControlCommand(
                         drive,
-                        IMU.instance::getCorrectedAngle,
                         driver::swerveX,
                         driver::swerveY,
                         driver::swerveRot));
