@@ -136,9 +136,14 @@ public class Constants {
 
     public static final class VisionTargetingConstants {
         // radians per second per radians
-        public static final double TARGETING_KP = 1;
+        public static final double TARGETING_KP = 0.175;
         public static final double TARGETING_KI = 0;
         public static final double TARGETING_KD = 0;
+        public static final double TARGETING_MIN_COMMAND = 0.1;
+
+        public static final double TARGET_HEIGHT = 1.219; // METERS
+        public static final double LIMELIGHT_HEIGHT = 0.381; // METERS
+        public static final double LIMELIGHT_ANGLE = 27; // DEGREES
 
         // this is just kP because:
         // 1: this is for a second-order cascaded controller

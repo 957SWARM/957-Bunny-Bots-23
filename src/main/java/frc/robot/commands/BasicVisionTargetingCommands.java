@@ -2,7 +2,6 @@ package frc.robot.commands;
 
 import com.team957.lib.controllers.feedback.PID;
 import com.team957.lib.controllers.feedback.PID.PIDConstants;
-import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.VisionTargetingConstants;
 import frc.robot.commands.drivetrain.ChassisControlCommand;
@@ -34,7 +33,8 @@ public class BasicVisionTargetingCommands {
                 driveSubsystem,
                 () -> 0,
                 () -> 0,
-                () -> clamp(pid.calculate(Units.degreesToRadians(txSupplier.getAsDouble()))));
+                // () -> clamp(pid.calculate(Units.degreesToRadians(txSupplier.getAsDouble()))));
+                () -> 0.1);
 
         // TODO: run closed-loop off of gyro, not LL
     }
