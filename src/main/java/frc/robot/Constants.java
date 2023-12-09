@@ -92,8 +92,8 @@ public class Constants {
 
     public static final class BallPathConstants {
         public static final int MAX_BALL_COUNT = 5;
-        public static final double DEBOUNCE_CURRENT_TIME = .06;
-        public static final double DEBOUNCE_SENSOR_TIME = .06;
+        public static final double DEBOUNCE_CURRENT_TIME = 0;
+        public static final double DEBOUNCE_SENSOR_TIME = 0.04;
     }
 
     public static final class ShooterConstants {
@@ -129,7 +129,7 @@ public class Constants {
         public static final double ki = 0;
         public static final double kd = 0;
         public static final int RPM_TOLERANCE = 20;
-        public static final double TRANSFER_PERCENT_POWER = .6;
+        public static final double TRANSFER_PERCENT_POWER = 1;
         public static final int CURRENT_LIMIT = 40;
         public static final int VOLTAGE_LIMIT = 11;
     }

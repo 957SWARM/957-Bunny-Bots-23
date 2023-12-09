@@ -180,12 +180,14 @@ public class RobotContainer {
                                         }));
 
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
+        /* 
         currentThresholdTrigger =
                 new Trigger(() -> shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD))
                         .debounce(
                                 BallPathConstants.DEBOUNCE_CURRENT_TIME,
                                 Debouncer.DebounceType.kBoth)
                         .onTrue(Commands.runOnce(() -> ballCount--));
+        */
 
         // ejects balls if we have more than the max allowed (5)
         tooManyBallsTrigger =
