@@ -3,8 +3,10 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+
 import edu.wpi.first.math.filter.LinearFilter;
 import edu.wpi.first.wpilibj.Encoder;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.peripherals.UI;
@@ -58,8 +60,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void periodic() {
         filterOutput = filter.calculate(motor.getOutputCurrent());
-
-        UI.getInstance().setShooterSpeed(encoder.getRate() / 2048 / 40);
+        SmartDashboard.putNumber("current", filterOutput);
+        UI.getInstance().setShooterSpeed(encoder.getRate() * 60);
     }
 
     public void setVoltage(double volts) {
