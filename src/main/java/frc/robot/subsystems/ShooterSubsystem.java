@@ -40,11 +40,14 @@ public class ShooterSubsystem extends SubsystemBase {
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kCoast);
         motor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT);
+        // 2048 encoder ticks per revolution
+        encoder.setDistancePerPulse(1.0/2048);
         filter = LinearFilter.highPass(.1, .02);
     }
 
     public double getRPM() {
-        return (encoder.getRate() / 2048.0) / 4.0;
+        // converts rps to rpm
+        return (encoder.getRate()) * 60;
     }
 
     public boolean aboveThreshold(double threshold) {
