@@ -43,6 +43,8 @@ public class ShooterSubsystem extends SubsystemBase {
         // 2048 encoder ticks per revolution
         encoder.setDistancePerPulse(1.0/2048);
         filter = LinearFilter.highPass(.1, .02);
+        motor.setInverted(true);
+        motor.setIdleMode(IdleMode.kCoast);
     }
 
     public double getRPM() {
