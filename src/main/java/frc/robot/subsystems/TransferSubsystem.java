@@ -15,6 +15,7 @@ public class TransferSubsystem extends SubsystemBase {
         motor.configFactoryDefault();
         // motor.configVoltageCompSaturation(TransferConstants.VOLTAGE_LIMIT);
         motor.configPeakCurrentLimit(TransferConstants.CURRENT_LIMIT);
+        motor.setInverted(true);
     }
 
     public void on() {
