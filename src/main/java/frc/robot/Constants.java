@@ -92,8 +92,8 @@ public class Constants {
 
     public static final class BallPathConstants {
         public static final int MAX_BALL_COUNT = 5;
-        public static final double DEBOUNCE_CURRENT_TIME = .3;
-        public static final double DEBOUNCE_SENSOR_TIME = .1;
+        public static final double DEBOUNCE_CURRENT_TIME = .06;
+        public static final double DEBOUNCE_SENSOR_TIME = .06;
     }
 
     public static final class ShooterConstants {

@@ -56,6 +56,6 @@ public class IntakeSubsystem extends SubsystemBase {
     }
 
     public void setVoltage(double voltage) {
-        motor.set(ControlMode.PercentOutput, voltage / motor.getBusVoltage());
+        motor.set(ControlMode.PercentOutput, voltage / 12);
     }
 }

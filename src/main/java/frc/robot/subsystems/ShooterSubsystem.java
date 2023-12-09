@@ -41,7 +41,7 @@ public class ShooterSubsystem extends SubsystemBase {
         motor.setIdleMode(IdleMode.kCoast);
         motor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT);
         // 2048 encoder ticks per revolution
-        encoder.setDistancePerPulse(1.0/2048);
+        encoder.setDistancePerPulse(1.0 / 2048);
         filter = LinearFilter.highPass(.1, .02);
         motor.setInverted(true);
         motor.setIdleMode(IdleMode.kCoast);
