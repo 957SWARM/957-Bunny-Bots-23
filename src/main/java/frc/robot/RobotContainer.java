@@ -176,11 +176,10 @@ public class RobotContainer {
                                 Commands.runOnce(
                                         () -> {
                                             ballCount++;
-                                            System.out.println("Increase!");
                                         }));
 
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
-        /* 
+        /*
         currentThresholdTrigger =
                 new Trigger(() -> shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD))
                         .debounce(
@@ -259,8 +258,6 @@ public class RobotContainer {
                 shooterWaitDelay = 0;
             }
         }
-        System.out.println(ballCount);
-        System.out.println(ballPathState);
         // pushes ball count to dashboard
         UI.getInstance().setBallCount(ballCount);
     }

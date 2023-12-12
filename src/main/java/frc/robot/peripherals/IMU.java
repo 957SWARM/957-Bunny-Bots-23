@@ -1,6 +1,6 @@
 package frc.robot.peripherals;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.ctre.phoenix.sensors.Pigeon2;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.util.Units;
 import frc.robot.Constants;
@@ -10,7 +10,7 @@ public class IMU {
 
     private IMU() {}
 
-    private final AHRS navx = new AHRS();
+    private final Pigeon2 pigeon = new Pigeon2(0);
 
     private Rotation2d angleOffset = new Rotation2d();
     // this is the number ADDED to the raw value to get the corrected angle
@@ -33,11 +33,11 @@ public class IMU {
     }
 
     public Rotation2d getRawAngle() {
-        return navx.getRotation2d();
+        return new Rotation2d(pigeon.getYaw());
     }
 
     public double getAngularVelocityRadiansPerSecond() {
-        return Units.degreesToRadians(navx.getRate())
+        return Units.degreesToRadians(0) // TODO
                 * (Constants.IMUConstants.YAW_AXIS_INVERTED ? -1 : 1);
     }
 }

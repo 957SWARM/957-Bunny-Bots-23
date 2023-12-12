@@ -89,7 +89,7 @@ public class ModuleControlCommand extends CommandBase {
 
             double steerFeedback =
                     module.steerFeedback.calculate(module.hw.getSteerPositionRadians(), dt);
-            module.hw.setSteerControlInput(steerFeedback); // negated
+            module.hw.setSteerControlInput(steerFeedback);
         }
     }
 }

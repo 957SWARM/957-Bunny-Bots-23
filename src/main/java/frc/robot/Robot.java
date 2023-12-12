@@ -85,7 +85,7 @@ public class Robot extends TimedRobot {
             timerControllerUpdate = 0;
         }
 
-        System.out.println(getDistanceFromTarget());
+        // System.out.println(getDistanceFromTarget());
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
