@@ -16,12 +16,12 @@ public class DefaultDriver implements DriverInput {
 
     @Override
     public double swerveX() {
-        return LIN_MAX_SPEED * xboxController.getLeftX();
+        return LIN_MAX_SPEED * xboxController.getLeftY();
     }
 
     @Override
     public double swerveY() {
-        return LIN_MAX_SPEED * -xboxController.getLeftY();
+        return LIN_MAX_SPEED * -xboxController.getLeftX();
     }
 
     @Override
@@ -54,7 +54,7 @@ public class DefaultDriver implements DriverInput {
     }
 
     public boolean visionTargeting() {
-        return xboxController.b().getAsBoolean();
+        return xboxController.rightBumper().getAsBoolean();
     }
 
     public boolean increaseBallCount() {

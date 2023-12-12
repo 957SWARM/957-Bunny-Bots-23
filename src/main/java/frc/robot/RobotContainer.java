@@ -146,7 +146,7 @@ public class RobotContainer {
                         .onTrue(Commands.runOnce(() -> ballPathState = RobotState.INTAKE));
 
         ejectTrigger =
-                new Trigger(() -> driver.intake())
+                new Trigger(() -> driver.eject())
                         .onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
 
         // visionTrigger =
@@ -171,15 +171,21 @@ public class RobotContainer {
                         .debounce(
                                 BallPathConstants.DEBOUNCE_SENSOR_TIME,
                                 Debouncer.DebounceType.kBoth)
-                        .onTrue(Commands.runOnce(() -> ballCount++));
+                        .onTrue(
+                                Commands.runOnce(
+                                        () -> {
+                                            ballCount++;
+                                        }));
 
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
+        /*
         currentThresholdTrigger =
                 new Trigger(() -> shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD))
                         .debounce(
                                 BallPathConstants.DEBOUNCE_CURRENT_TIME,
                                 Debouncer.DebounceType.kBoth)
                         .onTrue(Commands.runOnce(() -> ballCount--));
+        */
 
         // ejects balls if we have more than the max allowed (5)
         tooManyBallsTrigger =
@@ -251,7 +257,6 @@ public class RobotContainer {
                 shooterWaitDelay = 0;
             }
         }
-
         // pushes ball count to dashboard
         UI.getInstance().setBallCount(ballCount);
     }

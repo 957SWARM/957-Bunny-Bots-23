@@ -14,12 +14,16 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
-import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.commands.drivetrain.PathFollowCommands;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DriverInput;
 import frc.robot.peripherals.IMU;
 import frc.robot.peripherals.PoseEstimation;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.Constants.VisionTargetingConstants;
+import frc.robot.commands.drivetrain.ChassisControlCommand;
+import frc.robot.peripherals.Limelight;
+import frc.robot.peripherals.LimelightLib;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -40,7 +44,9 @@ public class Robot extends TimedRobot {
     private final DriveSubsystem drive = new DriveSubsystem();
 
     private final PoseEstimation odom =
+    
             new PoseEstimation(drive::getStates, IMU.instance::getCorrectedAngle, new Pose2d());
+    Trigger visionTrigger;
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -58,6 +64,9 @@ public class Robot extends TimedRobot {
         BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
 
         IMU.instance.setAngleToZero();
+
+        // prevent robot freakout on first vision button press??
+        Limelight.getInstance().getTx();
     }
 
     /**
@@ -87,6 +96,8 @@ public class Robot extends TimedRobot {
             m_robotContainer.updateControllers();
             timerControllerUpdate = 0;
         }
+
+        // System.out.println(getDistanceFromTarget());
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -131,14 +142,9 @@ public class Robot extends TimedRobot {
         }
 
         // temporary workaround for commandscheduler requirements issues
-        CommandScheduler.getInstance()
-                .schedule(
-                        new FieldRelativeControlCommand(
-                                drive,
-                                IMU.instance::getCorrectedAngle,
-                                driver::swerveX,
-                                driver::swerveY,
-                                driver::swerveRot));
+        drive.setDefaultCommand(
+                new ChassisControlCommand(
+                        drive, driver::swerveX, driver::swerveY, () -> getRotationVelocity()));
     }
 
     /** This function is called periodically during operator control. */
@@ -162,4 +168,33 @@ public class Robot extends TimedRobot {
     /** This function is called periodically whilst in simulation. */
     @Override
     public void simulationPeriodic() {}
+
+    public double getRotationVelocity() {
+        // System.out.println(LimelightLib.getTX("limelight"));
+        if (driver.visionTargeting()) {
+            double kp = VisionTargetingConstants.TARGETING_KP;
+            double minCommand = VisionTargetingConstants.TARGETING_MIN_COMMAND;
+            double tx = -LimelightLib.getTX("limelight");
+            if (Math.abs(tx) > 1) {
+                if (tx > 0) {
+                    return kp * tx + minCommand;
+                } else {
+                    return kp * tx - minCommand;
+                }
+            }
+            return 0;
+        } else {
+            return driver.swerveRot();
+        }
+    }
+
+    public double getDistanceFromTarget() {
+        double angleToGoalDegrees =
+                VisionTargetingConstants.LIMELIGHT_ANGLE + LimelightLib.getTY("limelight");
+        double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+        double distanceFromLimelightToGoalMeters =
+                (VisionTargetingConstants.TARGET_HEIGHT - VisionTargetingConstants.LIMELIGHT_HEIGHT)
+                        / Math.tan(angleToGoalRadians);
+        return distanceFromLimelightToGoalMeters;
+    }
 }

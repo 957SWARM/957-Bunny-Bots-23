@@ -22,10 +22,10 @@ public class Constants {
         // all calls to this kinematics object must match it
         public static final SwerveDriveKinematics KINEMATICS =
                 new SwerveDriveKinematics(
-                        FRONT_LEFT_TRANSFORM,
-                        FRONT_RIGHT_TRANSFORM,
+                        BACK_LEFT_TRANSFORM,
                         BACK_RIGHT_TRANSFORM,
-                        BACK_LEFT_TRANSFORM);
+                        FRONT_RIGHT_TRANSFORM,
+                        FRONT_LEFT_TRANSFORM);
 
         public static final PIDConstants STEER_FEEDBACK_CONSTANTS = new PIDConstants(2.5, 0, 0);
         public static final PIDConstants DRIVE_FEEDBACK_CONSTANTS = new PIDConstants(1, 7.5, 0);
@@ -37,25 +37,25 @@ public class Constants {
         public static final int DRIVE_CURRENT_LIMIT_AMPS = 50;
         public static final int STEER_CURRENT_LIMIT_AMPS = 20;
 
-        public static final int FRONT_LEFT_DRIVE_CANID = 3;
-        public static final int FRONT_LEFT_STEER_CANID = 4;
+        public static final int FRONT_LEFT_DRIVE_CANID = 7;
+        public static final int FRONT_LEFT_STEER_CANID = 8;
 
         public static final int FRONT_RIGHT_DRIVE_CANID = 1;
         public static final int FRONT_RIGHT_STEER_CANID = 2;
 
-        public static final int BACK_RIGHT_DRIVE_CANID = 7;
-        public static final int BACK_RIGHT_STEER_CANID = 8;
+        public static final int BACK_RIGHT_DRIVE_CANID = 3;
+        public static final int BACK_RIGHT_STEER_CANID = 4;
 
         public static final int BACK_LEFT_DRIVE_CANID = 5;
         public static final int BACK_LEFT_STEER_CANID = 6;
 
         // the offset is the "raw" value reported when the module is at the "zero" position
 
-        // last updated: November 15 8:30 PM
-        public static final double FRONT_LEFT_OFFSET_RADIANS = 2.62 - (Math.PI / 2);
-        public static final double FRONT_RIGHT_OFFSET_RADIANS = 0;
-        public static final double BACK_RIGHT_OFFSET_RADIANS = -(Math.PI / 2);
-        public static final double BACK_LEFT_OFFSET_RADIANS = 0;
+        // last updated: Dec 9 2 PM for compbot
+        public static final double FRONT_LEFT_OFFSET_RADIANS = 4.12 - (Math.PI / 2);
+        public static final double FRONT_RIGHT_OFFSET_RADIANS = 3.03;
+        public static final double BACK_RIGHT_OFFSET_RADIANS = 3.27 - (Math.PI / 2);
+        public static final double BACK_LEFT_OFFSET_RADIANS = 3.63;
 
         public static final boolean DEFAULT_BRAKE_MODE_ENABLED = false;
 
@@ -75,8 +75,8 @@ public class Constants {
 
     public static final class BallPathConstants {
         public static final int MAX_BALL_COUNT = 5;
-        public static final double DEBOUNCE_CURRENT_TIME = .3;
-        public static final double DEBOUNCE_SENSOR_TIME = .1;
+        public static final double DEBOUNCE_CURRENT_TIME = 0;
+        public static final double DEBOUNCE_SENSOR_TIME = 0.04;
     }
 
     public static final class ShooterConstants {
@@ -90,6 +90,13 @@ public class Constants {
         public static final double WAIT_DURATION = 0.5;
         public static final int DETECTION_THRESHOLD = 55;
         public static final int CURRENT_LIMIT = 10;
+
+        public static final double PID_P = 0;
+        public static final double PID_I = 0;
+        public static final double PID_D = 0;
+        public static final double FEEDFORWARD_KS_VOLTS = 0;
+        public static final double FEEDFORWARD_KV_VOLT_SECONDS_PER_METER = 0;
+        public static final double FEEDFORWARD_KA_VOLT_SECONDS_SQUARED_PER_RADIAN = 0;
     }
 
     public static final class IntakeConstants {
@@ -112,14 +119,21 @@ public class Constants {
         public static final double ki = 0;
         public static final double kd = 0;
         public static final int RPM_TOLERANCE = 20;
-        public static final double TRANSFER_PERCENT_POWER = .6;
+        public static final double TRANSFER_PERCENT_POWER = 1;
         public static final int CURRENT_LIMIT = 40;
         public static final int VOLTAGE_LIMIT = 11;
     }
 
     public static final class VisionTargetingConstants {
-        // radians per second per error unit (pixels?)
-        public static final double TARGETING_KP = 0.0;
+        // radians per second per radians
+        public static final double TARGETING_KP = 0.175;
+        public static final double TARGETING_KI = 0;
+        public static final double TARGETING_KD = 0;
+        public static final double TARGETING_MIN_COMMAND = 0.1;
+
+        public static final double TARGET_HEIGHT = 1.219; // METERS
+        public static final double LIMELIGHT_HEIGHT = 0.381; // METERS
+        public static final double LIMELIGHT_ANGLE = 27; // DEGREES
 
         // this is just kP because:
         // 1: this is for a second-order cascaded controller
@@ -155,6 +169,9 @@ public class Constants {
         public static final boolean YAW_AXIS_INVERTED = true;
         // this should NOT be applied to the navx.getRotation2D(), that's already offset
         // this is for the angular rate
+
+        // the value reported as "unoffset" when the robot is zeroed
+        public static final double YAW_OFFSET = -Math.PI;
     }
 
     public static final class PDHConstants {
