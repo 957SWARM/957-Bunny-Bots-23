@@ -92,7 +92,7 @@ public class Constants {
 
     public static final class BallPathConstants {
         public static final int MAX_BALL_COUNT = 5;
-        public static final double DEBOUNCE_CURRENT_TIME = 0;
+        public static final double DEBOUNCE_CURRENT_TIME = 0.2;
         public static final double DEBOUNCE_SENSOR_TIME = 0.04;
     }
 
@@ -103,9 +103,9 @@ public class Constants {
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 11;
         public static final double RUNNING_VOLTAGE = 11;
-        public static final int SPEED_RPM = 3000;
+        public static final int SPEED_RPM = 3700;
         public static final double WAIT_DURATION = 0.5;
-        public static final int DETECTION_THRESHOLD = 55;
+        public static final int DETECTION_THRESHOLD = 5;
         public static final int CURRENT_LIMIT = 10;
 
         public static final double PID_P = 0;
@@ -135,8 +135,8 @@ public class Constants {
         public static final double kp = 0;
         public static final double ki = 0;
         public static final double kd = 0;
-        public static final int RPM_TOLERANCE = 20;
-        public static final double TRANSFER_PERCENT_POWER = 1;
+        public static final int RPM_TOLERANCE = 500;
+        public static final double TRANSFER_PERCENT_POWER = .75;
         public static final int CURRENT_LIMIT = 40;
         public static final int VOLTAGE_LIMIT = 11;
     }

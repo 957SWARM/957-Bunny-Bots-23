@@ -59,8 +59,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void periodic() {
         filterOutput = filter.calculate(motor.getOutputCurrent());
-        SmartDashboard.putNumber("current", filterOutput);
-        UI.getInstance().setShooterSpeed(encoder.getRate() * 60);
+        SmartDashboard.putNumber("amps", filterOutput);
+        UI.getInstance().setShooterSpeed(encoder.getRate() * 60.0);
     }
 
     public void setVoltage(double volts) {

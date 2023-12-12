@@ -86,6 +86,8 @@ public class Robot extends TimedRobot {
         }
 
         // System.out.println(getDistanceFromTarget());
+
+        System.out.println(IMU.instance.getCorrectedAngle().getRadians());
     }
 
     /** This function is called once each time the robot enters Disabled mode. */

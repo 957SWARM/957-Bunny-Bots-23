@@ -99,6 +99,7 @@ public class RobotContainer {
         // timer object
         dtUtilBreakBeam = new DeltaTimeUtil();
         dtUtilShooterCurrent = new DeltaTimeUtil();
+        dtUtilShooterWait = new DeltaTimeUtil();
 
         // m_shooter.setDefaultCommand(new FlywheelControlCommand(m_shooter, () ->
         // targetShooterRPM));
@@ -107,7 +108,7 @@ public class RobotContainer {
                 new TransferControlCommand(
                         transfer,
                         () -> enableTransfer,
-                        () -> currentShooterRPM,
+                        () -> shooter.getRPM(),
                         () -> targetShooterRPM));
 
         intake.setDefaultCommand(new IntakeControlCommand(intake, () -> intakeState.voltage()));
@@ -136,7 +137,12 @@ public class RobotContainer {
 
         cancelTrigger =
                 new Trigger(() -> driver.cancel())
-                        .onTrue(Commands.runOnce(() -> ballPathState = RobotState.IDLE));
+                        .onTrue(Commands.runOnce(() -> {
+                                if(ballPathState == RobotState.SHOOT){
+                                        ballCount = 0;
+                                }
+                                ballPathState = RobotState.IDLE;
+                        }));
 
         shootTrigger =
                 new Trigger(() -> driver.shoot())
@@ -162,7 +168,11 @@ public class RobotContainer {
 
         decreaseBallTrigger =
                 new Trigger(() -> driver.decreaseBallCount())
-                        .onTrue(Commands.runOnce(() -> ballCount--));
+                        .onTrue(Commands.runOnce(() ->{
+                                if(ballCount > 0){
+                                        ballCount--;
+                                }
+                        }));
 
         // SENSING TRIGGERS
         // increases ball count if breakbeam sensor detects something. Debounced to prevent rapid
@@ -179,15 +189,17 @@ public class RobotContainer {
                                         }));
 
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
-        /*
+        /* 
         currentThresholdTrigger =
                 new Trigger(() -> shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD))
                         .debounce(
                                 BallPathConstants.DEBOUNCE_CURRENT_TIME,
                                 Debouncer.DebounceType.kBoth)
-                        .onTrue(Commands.runOnce(() -> ballCount--));
-        */
-
+                        .onTrue(Commands.runOnce(() -> {
+                                        ballCount--;
+                                        System.out.println("woah!");
+                                }));
+                        */
         // ejects balls if we have more than the max allowed (5)
         tooManyBallsTrigger =
                 new Trigger(() -> ballCount > BallPathConstants.MAX_BALL_COUNT)
@@ -248,7 +260,7 @@ public class RobotContainer {
             default:
                 break;
         }
-
+        /*
         if (ballPathState == RobotState.SHOOT && ballCount == 0) {
             // Need to figure out how to add a delay of .5seconds so that robot can shoot final ball
             // before turning idle
@@ -258,6 +270,7 @@ public class RobotContainer {
                 shooterWaitDelay = 0;
             }
         }
+        */
         // pushes ball count to dashboard
         UI.getInstance().setBallCount(ballCount);
     }

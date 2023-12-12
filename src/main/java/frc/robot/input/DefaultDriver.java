@@ -4,8 +4,8 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 
 public class DefaultDriver implements DriverInput {
 
-    private static final double LIN_MAX_SPEED = 3;
-    private static final double ROT_MAX_SPEED = 6;
+    private static final double LIN_MAX_SPEED = 6;
+    private static final double ROT_MAX_SPEED = 10;
 
     private final CommandXboxController xboxController;
 
