@@ -137,12 +137,14 @@ public class RobotContainer {
 
         cancelTrigger =
                 new Trigger(() -> driver.cancel())
-                        .onTrue(Commands.runOnce(() -> {
-                                if(ballPathState == RobotState.SHOOT){
-                                        ballCount = 0;
-                                }
-                                ballPathState = RobotState.IDLE;
-                        }));
+                        .onTrue(
+                                Commands.runOnce(
+                                        () -> {
+                                            if (ballPathState == RobotState.SHOOT) {
+                                                ballCount = 0;
+                                            }
+                                            ballPathState = RobotState.IDLE;
+                                        }));
 
         shootTrigger =
                 new Trigger(() -> driver.shoot())
@@ -168,11 +170,13 @@ public class RobotContainer {
 
         decreaseBallTrigger =
                 new Trigger(() -> driver.decreaseBallCount())
-                        .onTrue(Commands.runOnce(() ->{
-                                if(ballCount > 0){
-                                        ballCount--;
-                                }
-                        }));
+                        .onTrue(
+                                Commands.runOnce(
+                                        () -> {
+                                            if (ballCount > 0) {
+                                                ballCount--;
+                                            }
+                                        }));
 
         // SENSING TRIGGERS
         // increases ball count if breakbeam sensor detects something. Debounced to prevent rapid
@@ -189,7 +193,7 @@ public class RobotContainer {
                                         }));
 
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
-        /* 
+        /*
         currentThresholdTrigger =
                 new Trigger(() -> shooter.aboveThreshold(ShooterConstants.DETECTION_THRESHOLD))
                         .debounce(
