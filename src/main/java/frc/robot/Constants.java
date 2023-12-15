@@ -93,7 +93,7 @@ public class Constants {
     public static final class BallPathConstants {
         public static final int MAX_BALL_COUNT = 5;
         public static final double DEBOUNCE_CURRENT_TIME = 0.2;
-        public static final double DEBOUNCE_SENSOR_TIME = 0.04;
+        public static final double DEBOUNCE_SENSOR_TIME = 0.00;
     }
 
     public static final class ShooterConstants {
@@ -103,7 +103,7 @@ public class Constants {
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 11;
         public static final double RUNNING_VOLTAGE = 11;
-        public static final int SPEED_RPM = 3700;
+        public static final int SPEED_RPM = 3300;
         public static final double WAIT_DURATION = 0.5;
         public static final int DETECTION_THRESHOLD = 5;
         public static final int CURRENT_LIMIT = 10;
@@ -111,8 +111,8 @@ public class Constants {
         public static final double PID_P = 0;
         public static final double PID_I = 0;
         public static final double PID_D = 0;
-        public static final double FEEDFORWARD_KS_VOLTS = 0;
-        public static final double FEEDFORWARD_KV_VOLT_SECONDS_PER_METER = 0;
+        public static final double FEEDFORWARD_KS_VOLT = 0.15;
+        public static final double FEEDFORWARD_KV_VOLT_SECONDS_PER_METER = 0.0025;
         public static final double FEEDFORWARD_KA_VOLT_SECONDS_SQUARED_PER_RADIAN = 0;
     }
 
@@ -123,7 +123,7 @@ public class Constants {
         public static final int CURRENT_LIMIT = 40;
         public static final int VOLTAGE_LIMIT = 11;
 
-        public static final double RUNNING_VOLTAGE = 9;
+        public static final double RUNNING_VOLTAGE = 12;
         public static final int CAN_ID = 10;
 
         public static final int BREAKBEAM_DIO_PORT = 2;
@@ -143,14 +143,30 @@ public class Constants {
 
     public static final class VisionTargetingConstants {
         // radians per second per radians
-        public static final double TARGETING_KP = 0.175;
+        public static final double TARGETING_KP = 0.15;
         public static final double TARGETING_KI = 0;
         public static final double TARGETING_KD = 0;
         public static final double TARGETING_MIN_COMMAND = 0.1;
 
-        public static final double TARGET_HEIGHT = 1.219; // METERS
-        public static final double LIMELIGHT_HEIGHT = 0.381; // METERS
-        public static final double LIMELIGHT_ANGLE = 27; // DEGREES
+        public static final double TARGET_HEIGHT = 1.422; // METERS
+        public static final double LIMELIGHT_HEIGHT = 0.546; // METERS
+        public static final double LIMELIGHT_ANGLE = 30; // DEGREES
+
+        public static final double SHOOTER_OFFSET = .203; // METERS
+        // public static final double SHOOTER_ANGLE = 45; //DEGREES
+
+        public static final double[] LUT_DISTANCE = {
+            1.29, 
+            2.24,
+            0.67,
+            4.18
+        }; // METERS
+        public static final double[] LUT_RPM = {
+            2800,
+            3000,
+            4500,
+            3300
+        }; // RPM
 
         // this is just kP because:
         // 1: this is for a second-order cascaded controller
@@ -172,6 +188,7 @@ public class Constants {
         public static final double REDORANGE = 0.63;
         public static final double AUTOMATION = -0.57;
         public static final double SECOND_AUTOMATION = -0.89;
+        public static final double OFF = 0.00;
 
         public static final int GREEN_VALUE = 0;
         public static final int GOLD_RANGE_MIN = 1;

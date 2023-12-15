@@ -5,15 +5,15 @@
 package frc.robot;
 
 import com.team957.lib.util.DeltaTimeUtil;
-import edu.wpi.first.math.filter.Debouncer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import frc.robot.Constants.BallPathConstants;
 import frc.robot.Constants.BlinkinConstants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.IntakeControlCommand;
-import frc.robot.commands.ShooterControlCommand;
+import frc.robot.commands.PIDFshooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
@@ -22,6 +22,7 @@ import frc.robot.input.OperatorInput;
 import frc.robot.peripherals.IMU;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
+import frc.robot.subsystems.BlinkinSubsystem.BlinkinState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
@@ -91,6 +92,11 @@ public class RobotContainer {
     Trigger automationTrigger;
     Trigger secondAutomationTrigger;
 
+    // Blinkin
+    double signalLightDelay = 0;
+
+    private double[] regressionCoefficients;
+
     /*
      * RobotContainer Constructor.
      * Sets up default commands and calls configureBindings()
@@ -113,7 +119,15 @@ public class RobotContainer {
 
         intake.setDefaultCommand(new IntakeControlCommand(intake, () -> intakeState.voltage()));
 
-        shooter.setDefaultCommand(new ShooterControlCommand(shooter, () -> targetShooterRPM));
+        shooter.setDefaultCommand(new PIDFshooterControlCommand(shooter, () -> targetShooterRPM));
+
+        blinkin.setDefaultCommand(
+                blinkin.setColorCommand(
+                        DriverStation.isFMSAttached()
+                                ? (DriverStation.getAlliance() == DriverStation.Alliance.Red
+                                        ? BlinkinState.RED
+                                        : BlinkinState.BLUE)
+                                : BlinkinState.GOLD));
 
         configureBindings();
     }
@@ -140,9 +154,6 @@ public class RobotContainer {
                         .onTrue(
                                 Commands.runOnce(
                                         () -> {
-                                            if (ballPathState == RobotState.SHOOT) {
-                                                ballCount = 0;
-                                            }
                                             ballPathState = RobotState.IDLE;
                                         }));
 
@@ -164,33 +175,18 @@ public class RobotContainer {
         //                         new BasicVisionTargetingCommand(
         //                                 drive, Limelight.getInstance()::getTx));
 
-        increaseBallTrigger =
-                new Trigger(() -> driver.increaseBallCount())
-                        .onTrue(Commands.runOnce(() -> ballCount++));
-
-        decreaseBallTrigger =
-                new Trigger(() -> driver.decreaseBallCount())
-                        .onTrue(
-                                Commands.runOnce(
-                                        () -> {
-                                            if (ballCount > 0) {
-                                                ballCount--;
-                                            }
-                                        }));
-
         // SENSING TRIGGERS
         // increases ball count if breakbeam sensor detects something. Debounced to prevent rapid
         // changes
         beamBrokenTrigger =
                 new Trigger(() -> intake.isBeamBroken())
-                        .debounce(
-                                BallPathConstants.DEBOUNCE_SENSOR_TIME,
-                                Debouncer.DebounceType.kBoth)
                         .onTrue(
-                                Commands.runOnce(
-                                        () -> {
-                                            ballCount++;
-                                        }));
+                                blinkin.blinkCommand(
+                                                BlinkinState.GREEN, BlinkinState.OFF, 0.25, 0.25)
+                                        .withTimeout(1));
+
+        CommandScheduler.getInstance()
+                .schedule(blinkin.blinkCommand(BlinkinState.GREEN, BlinkinState.OFF, 0.25, 0.25));
 
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
         /*
@@ -204,28 +200,9 @@ public class RobotContainer {
                                         System.out.println("woah!");
                                 }));
                         */
-        // ejects balls if we have more than the max allowed (5)
-        tooManyBallsTrigger =
-                new Trigger(() -> ballCount > BallPathConstants.MAX_BALL_COUNT)
-                        .onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
 
         // BLINKIN LIGHT TRIGGERS
-        greenTrigger =
-                new Trigger(() -> ballCount == BlinkinConstants.GREEN_VALUE)
-                        .onTrue(blinkin.green());
 
-        // spotless:off
-        goldTrigger = new Trigger(() ->
-                ballCount >= BlinkinConstants.GOLD_RANGE_MIN && ballCount <= BlinkinConstants.GOLD_RANGE_MAX)
-                        .onTrue(blinkin.gold());
-
-        redOrangeTrigger = new Trigger(() ->
-                ballCount >= BlinkinConstants.REDORANGE_RANGE_MIN && ballCount <= BlinkinConstants.REDORANGE_RANGE_MAX)
-                        .onTrue(blinkin.redOrange());
-
-        redTrigger = new Trigger(() ->
-                ballCount >= BlinkinConstants.RED_RANGE_UPPERBOUND || ballCount < BlinkinConstants.RED_RANGE_LOWERBOUND)
-                        .onTrue(blinkin.red());
         // spotless:on
     }
 
@@ -238,21 +215,21 @@ public class RobotContainer {
                 // transfer off, shooter off, intake off
                 enableTransfer = false;
                 intakeState = IntakeStates.IDLE;
-                targetShooterRPM = 0;
+                targetShooterRPM = 3000;
                 break;
             case EJECT:
 
                 // transfer off, shooter off, intake eject
                 enableTransfer = false;
                 intakeState = IntakeStates.EJECT;
-                targetShooterRPM = 0;
+                targetShooterRPM = 3000;
                 break;
             case INTAKE:
 
                 // transfer off, shooter off, intake on
                 enableTransfer = false;
                 intakeState = IntakeStates.INTAKE;
-                targetShooterRPM = 0;
+                targetShooterRPM = 3000;
                 break;
             case SHOOT:
 
@@ -275,8 +252,7 @@ public class RobotContainer {
             }
         }
         */
-        // pushes ball count to dashboard
-        UI.getInstance().setBallCount(ballCount);
+
     }
 
     public Command getAutonomousCommand() {
@@ -288,4 +264,21 @@ public class RobotContainer {
         driver = UI.getInstance().getDriverBinding();
         operator = UI.getInstance().getOperatorBinding();
     }
+
+    public double calculateShooterRPM(double distance) {
+        double xSquaredCoeff = regressionCoefficients[0];
+        double xCoeff = regressionCoefficients[1];
+        double coeff = regressionCoefficients[2];
+
+        return (xSquaredCoeff * distance * distance) + (xCoeff * distance) + coeff;
+    }
+
+    /*private void generateRegression() {
+        final PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
+        final WeightedObservedPoints obs = new WeightedObservedPoints();
+        for (int i = 0; i < VisionTargetingConstants.LUT_DISTANCE.length; i++) {
+            obs.add(VisionTargetingConstants.LUT_DISTANCE[i], VisionTargetingConstants.LUT_RPM[i]);
+        }
+        regressionCoefficients = fitter.fit(obs.toList());
+    } */
 }

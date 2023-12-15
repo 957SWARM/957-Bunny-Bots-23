@@ -33,7 +33,7 @@ public class IMU {
     }
 
     public Rotation2d getRawAngle() {
-        return Rotation2d.fromDegrees(pigeon.getYaw());
+        return Rotation2d.fromDegrees(-pigeon.getYaw());
     }
 
     public double getAngularVelocityRadiansPerSecond() {

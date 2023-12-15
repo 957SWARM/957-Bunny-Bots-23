@@ -6,12 +6,13 @@ package frc.robot;
 
 import com.team957.lib.telemetry.BaseHardwareLogger;
 import com.team957.lib.telemetry.HighLevelLogger;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.VisionTargetingConstants;
-import frc.robot.commands.drivetrain.ChassisControlCommand;
+import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DriverInput;
 import frc.robot.peripherals.IMU;
@@ -85,9 +86,9 @@ public class Robot extends TimedRobot {
             timerControllerUpdate = 0;
         }
 
-        // System.out.println(getDistanceFromTarget());
+        System.out.println(getDistanceFromTarget());
 
-        System.out.println(IMU.instance.getCorrectedAngle().getRadians());
+        // System.out.println(IMU.instance.getCorrectedAngle().getRadians());
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -126,8 +127,16 @@ public class Robot extends TimedRobot {
 
         // temporary workaround for commandscheduler requirements issues
         drive.setDefaultCommand(
-                new ChassisControlCommand(
-                        drive, driver::swerveX, driver::swerveY, () -> getRotationVelocity()));
+                new FieldRelativeControlCommand(
+                        drive,
+                        IMU.instance::getCorrectedAngle,
+                        driver::swerveX,
+                        driver::swerveY,
+                        () -> calculateRotationVelocityWithOffset()));
+
+        // Set limelight to driver mode on startup
+        // LimelightLib.setPipelineIndex("limelight", 0);
+        Limelight.getInstance().setPipe(0);
     }
 
     /** This function is called periodically during operator control. */
@@ -152,13 +161,15 @@ public class Robot extends TimedRobot {
     @Override
     public void simulationPeriodic() {}
 
-    public double getRotationVelocity() {
+    public double calculateRotationVelocity(double target) {
         // System.out.println(LimelightLib.getTX("limelight"));
         if (driver.visionTargeting()) {
+            // LimelightLib.setPipelineIndex("limelight", 1);
+            Limelight.getInstance().setPipe(1);
             double kp = VisionTargetingConstants.TARGETING_KP;
             double minCommand = VisionTargetingConstants.TARGETING_MIN_COMMAND;
-            double tx = -LimelightLib.getTX("limelight");
-            if (Math.abs(tx) > 1) {
+            double tx = target;
+            if (Math.abs(tx) > 0.5) {
                 if (tx > 0) {
                     return kp * tx + minCommand;
                 } else {
@@ -167,8 +178,25 @@ public class Robot extends TimedRobot {
             }
             return 0;
         } else {
+            // LimelightLib.setPipelineIndex("limelight", 0);
+            Limelight.getInstance().setPipe(0);
             return driver.swerveRot();
         }
+    }
+
+    public double calculateRotationVelocityWithOffset() {
+        double tx = -LimelightLib.getTX("limelight");
+        boolean tv = LimelightLib.getTV("limelight");
+        double xOffset = VisionTargetingConstants.SHOOTER_OFFSET;
+        double yLimelight = getDistanceFromTarget();
+        double xLimelight = yLimelight * Math.tan(Units.degreesToRadians(tx));
+        double yShooter = yLimelight;
+        double xShooter = xLimelight + xOffset;
+        double shooterOffsetAngle = Units.radiansToDegrees(Math.atan2(xShooter, yShooter));
+        if (tv == true) {
+            return calculateRotationVelocity(shooterOffsetAngle);
+        }
+        return driver.swerveRot();
     }
 
     public double getDistanceFromTarget() {

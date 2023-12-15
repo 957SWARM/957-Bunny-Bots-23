@@ -3,7 +3,6 @@ package frc.robot.commands;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.Constants;
 import frc.robot.Constants.ShooterConstants;
 import frc.robot.subsystems.ShooterSubsystem;
 import java.util.function.DoubleSupplier;
@@ -16,7 +15,7 @@ public class PIDFshooterControlCommand extends CommandBase {
     private final PIDController pid;
     private final SimpleMotorFeedforward feedforward =
             new SimpleMotorFeedforward(
-                    ShooterConstants.FEEDFORWARD_KS_VOLTS,
+                    ShooterConstants.FEEDFORWARD_KS_VOLT,
                     ShooterConstants.FEEDFORWARD_KV_VOLT_SECONDS_PER_METER,
                     ShooterConstants.FEEDFORWARD_KA_VOLT_SECONDS_SQUARED_PER_RADIAN);
 
@@ -33,6 +32,6 @@ public class PIDFshooterControlCommand extends CommandBase {
         double pidfOutput =
                 pid.calculate(shooter.getRPM(), targetRPM.getAsDouble())
                         + feedforward.calculate(targetRPM.getAsDouble());
-        shooter.setVoltage(pidfOutput * Constants.ShooterConstants.RUNNING_VOLTAGE);
+        shooter.setVoltage(pidfOutput);
     }
 }

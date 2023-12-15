@@ -89,6 +89,9 @@ public class DriveSubsystem implements Subsystem {
 
             this.invertDrive = invertDrive;
 
+            drive.burnFlash();
+            steer.burnFlash();
+
             brakeModeEnabledLogger =
                     new Logger<>(
                             () -> brakeModeEnabled,

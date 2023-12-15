@@ -2,6 +2,7 @@ package frc.robot.peripherals;
 
 import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
 
 public final class Limelight {
@@ -29,6 +30,7 @@ public final class Limelight {
     DoubleSubscriber vertSub = table.getDoubleTopic("tvert").subscribe(0);
     DoubleSubscriber jsonSub = table.getDoubleTopic("tjson").subscribe(0);
     DoubleSubscriber getpipeSub = table.getDoubleTopic("getpipe").subscribe(0);
+    NetworkTableEntry pipelineEntry = table.getEntry("pipeline");
 
     private Limelight() {}
 
@@ -109,6 +111,10 @@ public final class Limelight {
     public double getTclass() {
         double tclass = classSub.get();
         return tclass;
+    }
+
+    public void setPipe(int id) {
+        pipelineEntry.setNumber(id);
     }
 
     public double getDistanceFromTarget() {
