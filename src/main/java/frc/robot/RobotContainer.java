@@ -11,6 +11,7 @@ import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.InterpolatingTreeMap;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -41,6 +42,7 @@ import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
 import java.util.Map.Entry;
+import java.util.function.Supplier;
 
 public class RobotContainer {
     public static enum RobotState {
@@ -118,6 +120,11 @@ public class RobotContainer {
     // Blinkin
     double signalLightDelay = 0;
 
+    private final SendableChooser<Command> autoChooser = new SendableChooser<>();
+
+    private final Supplier<Command> doNothingCommand =
+            () -> new ChassisControlCommand(drive, () -> new ChassisSpeeds());
+
     /*
      * RobotContainer Constructor.
      * Sets up default commands and calls configureBindings()
@@ -156,11 +163,44 @@ public class RobotContainer {
                         () -> calculateRotationVelocityWithOffset()));
 
         configureBindings();
+
+        ChoreoTrajectory oneBunnyPath = Choreo.getTrajectory("oneBunny");
+        ChoreoTrajectory justMovePath = Choreo.getTrajectory("justMove");
+
+        Command oneBunny =
+                Commands.runOnce(
+                                () -> {
+                                    odom.overridePose(oneBunnyPath.getInitialPose());
+                                })
+                        .andThen(
+                                PathFollowCommands.getPathFollowCommand(
+                                        drive, odom::getPoseEstimate, oneBunnyPath))
+                        .andThen(doNothingCommand.get())
+                        .alongWith(
+                                grabber.extendBunnyGrabber()
+                                        .withTimeout(4)
+                                        .andThen(
+                                                grabber.retractBunnyGrabber()
+                                                        .withTimeout(3)
+                                                        .andThen(grabber.extendBunnyGrabber())));
+
+        Command justMove =
+                Commands.runOnce(
+                                () -> {
+                                    odom.overridePose(justMovePath.getInitialPose());
+                                })
+                        .andThen(
+                                PathFollowCommands.getPathFollowCommand(
+                                        drive, odom::getPoseEstimate, justMovePath))
+                        .andThen(doNothingCommand.get());
+
+        autoChooser.setDefaultOption("DO NOTHING", doNothingCommand.get());
+        autoChooser.addOption("ONE BUNNY", oneBunny);
+        autoChooser.addOption("JUST MOVE", justMove);
     }
 
     public void updateOdom() {
         odom.update();
-        ;
     }
 
     /*
@@ -306,22 +346,11 @@ public class RobotContainer {
     }
 
     public Command getAutoCommand() {
-        ChoreoTrajectory path = Choreo.getTrajectory("test");
+        Command chosen = autoChooser.getSelected();
 
-        return Commands.runOnce(
-                        () -> {
-                            odom.overridePose(path.getInitialPose());
-                        })
-                .andThen(
-                        PathFollowCommands.getPathFollowCommand(drive, odom::getPoseEstimate, path))
-                .andThen(new ChassisControlCommand(drive, () -> new ChassisSpeeds()))
-                .alongWith(
-                        grabber.extendBunnyGrabber()
-                                .withTimeout(4)
-                                .andThen(
-                                        grabber.retractBunnyGrabber()
-                                                .withTimeout(3)
-                                                .andThen(grabber.extendBunnyGrabber())));
+        if (chosen == null) {
+            return doNothingCommand.get();
+        } else return chosen;
     }
 
     public double calculateRotationVelocity(double target) {
