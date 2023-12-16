@@ -6,6 +6,7 @@ import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.Constants;
 import frc.robot.subsystems.DriveSubsystem;
 import java.util.function.DoubleSupplier;
+import java.util.function.Supplier;
 
 public class ChassisControlCommand extends ModuleControlCommand {
     /**
@@ -36,5 +37,14 @@ public class ChassisControlCommand extends ModuleControlCommand {
 
                     return new CombinedModuleSetpoints(states[1], states[2], states[3], states[0]);
                 });
+    }
+
+    public ChassisControlCommand(
+            DriveSubsystem drive, Supplier<ChassisSpeeds> chassisSpeedSetpoint) {
+        this(
+                drive,
+                () -> chassisSpeedSetpoint.get().vxMetersPerSecond,
+                () -> chassisSpeedSetpoint.get().vyMetersPerSecond,
+                () -> chassisSpeedSetpoint.get().omegaRadiansPerSecond);
     }
 }

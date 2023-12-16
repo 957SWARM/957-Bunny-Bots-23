@@ -4,25 +4,37 @@
 
 package frc.robot;
 
+import com.choreo.lib.Choreo;
+import com.choreo.lib.ChoreoTrajectory;
 import com.team957.lib.util.DeltaTimeUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.util.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.BlinkinConstants;
+import frc.robot.Constants.VisionTargetingConstants;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.PIDFshooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
+import frc.robot.commands.drivetrain.ChassisControlCommand;
+import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
+import frc.robot.commands.drivetrain.PathFollowCommands;
 import frc.robot.input.DefaultDriver;
 import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.peripherals.IMU;
 import frc.robot.peripherals.Limelight;
+import frc.robot.peripherals.LimelightLib;
+import frc.robot.peripherals.PoseEstimation;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BlinkinSubsystem.BlinkinState;
 import frc.robot.subsystems.BunnyGrabberSubsystem;
+import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
 import frc.robot.subsystems.ShooterSubsystem;
@@ -45,11 +57,16 @@ public class RobotContainer {
     OperatorInput operator = new DefaultOperator(1);
 
     // Subsystems
+
+    private final DriveSubsystem drive = new DriveSubsystem();
     private final ShooterSubsystem shooter = new ShooterSubsystem();
     private final BunnyGrabberSubsystem grabber = new BunnyGrabberSubsystem();
     private final TransferSubsystem transfer = new TransferSubsystem();
     private final IntakeSubsystem intake = new IntakeSubsystem();
     private final BlinkinSubsystem blinkin = new BlinkinSubsystem(BlinkinConstants.BLINKIN_CHANNEL);
+
+    private final PoseEstimation odom =
+            new PoseEstimation(drive::getStates, IMU.instance::getCorrectedAngle, new Pose2d());
 
     // State Machine
     public RobotState ballPathState = RobotState.IDLE;
@@ -128,7 +145,20 @@ public class RobotContainer {
 
         shooter.setDefaultCommand(new PIDFshooterControlCommand(shooter, () -> targetShooterRPM));
 
+        drive.setDefaultCommand(
+                new FieldRelativeControlCommand(
+                        drive,
+                        IMU.instance::getCorrectedAngle,
+                        driver::swerveX,
+                        driver::swerveY,
+                        () -> calculateRotationVelocityWithOffset()));
+
         configureBindings();
+    }
+
+    public void updateOdom() {
+        odom.update();
+        ;
     }
 
     /*
@@ -254,13 +284,74 @@ public class RobotContainer {
 
     }
 
-    public Command getAutonomousCommand() {
-        return null;
-    }
-
     public void updateControllers() {
         // Controllers
         driver = UI.getInstance().getDriverBinding();
         operator = UI.getInstance().getOperatorBinding();
+    }
+
+    public Command getAutoCommand() {
+        ChoreoTrajectory path = Choreo.getTrajectory("test");
+
+        return Commands.runOnce(
+                        () -> {
+                            odom.overridePose(path.getInitialPose());
+                        })
+                .andThen(
+                        PathFollowCommands.getPathFollowCommand(drive, odom::getPoseEstimate, path))
+                .andThen(new ChassisControlCommand(drive, () -> new ChassisSpeeds()))
+                .alongWith(
+                        grabber.extendBunnyGrabber()
+                                .withTimeout(4)
+                                .andThen(
+                                        grabber.retractBunnyGrabber()
+                                                .withTimeout(3)
+                                                .andThen(grabber.extendBunnyGrabber())));
+    }
+
+    public double calculateRotationVelocity(double target) {
+        if (driver.visionTargeting()) {
+            double kp = VisionTargetingConstants.TARGETING_KP;
+            double minCommand = VisionTargetingConstants.TARGETING_MIN_COMMAND;
+            double tx = target;
+            if (Math.abs(tx) > 0.5) {
+                if (tx > 0) {
+                    return kp * tx + minCommand;
+                } else {
+                    return kp * tx - minCommand;
+                }
+            }
+            return 0;
+        } else {
+            return driver.swerveRot();
+        }
+    }
+
+    public double calculateRotationVelocityWithOffset() {
+        double tx = -LimelightLib.getTX("limelight");
+        boolean tv = LimelightLib.getTV("limelight");
+        double xOffset = VisionTargetingConstants.SHOOTER_OFFSET;
+        double yLimelight = getDistanceFromTarget();
+        double xLimelight = yLimelight * Math.tan(Units.degreesToRadians(tx));
+        double yShooter = yLimelight;
+        double xShooter = xLimelight + xOffset;
+        double shooterOffsetAngle = Units.radiansToDegrees(Math.atan2(xShooter, yShooter));
+
+        Limelight.getInstance().setPipe(driver.visionTargeting() ? 1 : 0);
+
+        if (tv == true) {
+            return calculateRotationVelocity(shooterOffsetAngle);
+        }
+        return driver.swerveRot();
+    }
+
+    public double getDistanceFromTarget() {
+        double angleToGoalDegrees =
+                VisionTargetingConstants.LIMELIGHT_ANGLE + LimelightLib.getTY("limelight");
+        double angleToGoalRadians = angleToGoalDegrees * (3.14159 / 180.0);
+        double distanceFromLimelightToGoalMeters =
+                (VisionTargetingConstants.TARGET_HEIGHT - VisionTargetingConstants.LIMELIGHT_HEIGHT)
+                        / Math.tan(angleToGoalRadians);
+        return distanceFromLimelightToGoalMeters;
     }
 }
