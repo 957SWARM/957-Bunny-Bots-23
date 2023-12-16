@@ -196,6 +196,8 @@ public class RobotContainer {
         autoChooser.setDefaultOption("DO NOTHING", doNothingCommand.get());
         autoChooser.addOption("ONE BUNNY", oneBunny);
         autoChooser.addOption("JUST MOVE", justMove);
+
+        SmartDashboard.putData(autoChooser);
     }
 
     public void updateOdom() {
