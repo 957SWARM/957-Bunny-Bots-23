@@ -118,8 +118,7 @@ public final class Limelight {
     }
 
     public double getDistanceFromTarget() {
-        // if target not seen, return bumper to bumper distance
-        if (getTv() < 1) {
+        if(getTv() < 1){
             return .67;
         }
         double angleToGoalDegrees = limelightAngle + getTy();
