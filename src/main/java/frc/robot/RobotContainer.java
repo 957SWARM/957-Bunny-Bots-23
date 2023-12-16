@@ -6,6 +6,7 @@ package frc.robot;
 
 import com.team957.lib.util.DeltaTimeUtil;
 import edu.wpi.first.util.InterpolatingTreeMap;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -69,13 +70,14 @@ public class RobotContainer {
     double shooterCurrentDelay = 0;
     double shooterWaitDelay = 0;
     boolean ballLeft = false;
-    double multiplier = .93;
+    double shooterMultiplier = .93;
 
     // Triggers
     // Control Triggers
 
     Trigger zeroIMUTrigger;
-
+    Trigger increaseShootPowerTrigger;
+    Trigger decreaseShootPowerTrigger;
     Trigger grabberTrigger;
     Trigger shootTrigger;
     Trigger cancelTrigger;
@@ -168,6 +170,18 @@ public class RobotContainer {
                 new Trigger(() -> driver.eject())
                         .onTrue(Commands.runOnce(() -> ballPathState = RobotState.EJECT));
 
+        increaseShootPowerTrigger =
+                new Trigger(() -> operator.increaseShootPower())
+                        .onTrue(
+                                Commands.runOnce(
+                                        () -> {
+                                            shooterMultiplier += .01;
+                                        }));
+
+        decreaseShootPowerTrigger =
+                new Trigger(() -> operator.decreaseShootPower())
+                        .onTrue(Commands.runOnce(() -> shooterMultiplier -= .01));
+
         // visionTrigger =
         //         new Trigger(() -> driver.visionTargeting())
         //                 .toggleOnTrue(
@@ -233,13 +247,14 @@ public class RobotContainer {
                 enableTransfer = true;
                 intakeState = IntakeStates.IDLE;
                 targetShooterRPM =
-                        multiplier
+                        shooterMultiplier
                                 * distanceToRPMMap.get(
                                         Limelight.getInstance().getDistanceFromTarget());
                 break;
             default:
                 break;
         }
+        SmartDashboard.putNumber("Shooter Multiplier", shooterMultiplier);
         /*
         if (ballPathState == RobotState.SHOOT && ballCount == 0) {
             // Need to figure out how to add a delay of .5seconds so that robot can shoot final ball

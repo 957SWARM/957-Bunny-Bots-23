@@ -103,4 +103,8 @@ public final class UI {
     public void setOperatorBinding(String name, OperatorInput operatorInput) {
         operatorChooser.addOption(name, operatorInput);
     }
+
+    public double getShooterMultiplier() {
+        return SmartDashboard.getNumber("Shooter Multiplier", 1);
+    }
 }
