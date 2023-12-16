@@ -1,4 +1,4 @@
-package frc.robot.microsystems;
+package frc.robot.peripherals;
 
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -102,5 +102,9 @@ public final class UI {
 
     public void setOperatorBinding(String name, OperatorInput operatorInput) {
         operatorChooser.addOption(name, operatorInput);
+    }
+
+    public double getShooterMultiplier() {
+        return SmartDashboard.getNumber("Shooter Multiplier", 1);
     }
 }

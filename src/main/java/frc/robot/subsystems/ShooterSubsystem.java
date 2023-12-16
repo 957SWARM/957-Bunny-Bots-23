@@ -4,10 +4,9 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.math.filter.LinearFilter;
-import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ShooterConstants;
-import frc.robot.microsystems.UI;
+import frc.robot.peripherals.UI;
 
 /*
  * See the following wiki pages:
@@ -26,25 +25,24 @@ import frc.robot.microsystems.UI;
 public class ShooterSubsystem extends SubsystemBase {
 
     private final CANSparkMax motor;
-    private final Encoder encoder;
     private LinearFilter filter;
     private double filterOutput;
 
     public ShooterSubsystem() {
         motor = new CANSparkMax(ShooterConstants.CAN_ID, MotorType.kBrushless);
 
-        encoder =
-                new Encoder(
-                        ShooterConstants.ENC_A, ShooterConstants.ENC_B, ShooterConstants.ENC_REV);
-
         motor.restoreFactoryDefaults();
         motor.setIdleMode(IdleMode.kCoast);
         motor.setSmartCurrentLimit(ShooterConstants.CURRENT_LIMIT);
+        // 2048 encoder ticks per revolution
         filter = LinearFilter.highPass(.1, .02);
+        motor.setInverted(true);
+        motor.setIdleMode(IdleMode.kCoast);
     }
 
     public double getRPM() {
-        return (encoder.getRate() / 2048.0) / 4.0;
+        // converts rps to rpm
+        return motor.getEncoder().getVelocity();
     }
 
     public boolean aboveThreshold(double threshold) {
@@ -53,8 +51,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public void periodic() {
         filterOutput = filter.calculate(motor.getOutputCurrent());
-
-        UI.getInstance().setShooterSpeed(encoder.getRate() / 2048 / 40);
+        // SmartDashboard.putNumber("amps", filterOutput);
+        UI.getInstance().setShooterSpeed(getRPM());
     }
 
     public void setVoltage(double volts) {

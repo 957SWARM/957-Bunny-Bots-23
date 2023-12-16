@@ -3,50 +3,71 @@ Time to Blink all over the place!*/
 
 package frc.robot.subsystems;
 
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.BlinkinConstants;
 
 public class BlinkinSubsystem extends SubsystemBase {
 
+    public static enum BlinkinState {
+        GREEN(0.73),
+        RED(0.61),
+        GOLD(0.67),
+        BLUE(0.87),
+        RED_ORANGE(0.63),
+        AUTOMATION(-0.57),
+        SECOND_AUTOMATION(-0.89),
+        OFF(0.99);
+
+        private final double dutyCycle;
+
+        BlinkinState(double dutyCycle) {
+            this.dutyCycle = dutyCycle;
+        }
+    }
+
     private final Spark motor;
+
+    private double speed = 0;
 
     public BlinkinSubsystem(int Channel) {
 
         motor = new Spark(Channel);
     }
 
-    // No balls
-    public CommandBase green() {
-        return this.runOnce(() -> motor.set(BlinkinConstants.GREEN));
+    @Override
+    public void periodic() {
+        motor.set(speed);
     }
 
-    // Full balls
-    public CommandBase red() {
-
-        return this.runOnce(() -> motor.set(BlinkinConstants.RED));
+    public CommandBase setColorCommand(BlinkinState state) {
+        return this.runOnce(() -> speed = state.dutyCycle);
     }
 
-    // 1-2 Balls
-    public CommandBase gold() {
+    public CommandBase blinkCommand(
+            BlinkinState stateA,
+            BlinkinState stateB,
+            double stateADurationSeconds,
+            double stateBDurationSeconds) {
+        return new CommandBase() {
+            final Timer timer = new Timer();
 
-        return this.runOnce(() -> motor.set(BlinkinConstants.GOLD));
-    }
+            @Override
+            public void initialize() {
+                timer.restart();
+            }
 
-    // 3-4 Balls
-    public CommandBase redOrange() {
-
-        return this.runOnce(() -> motor.set(BlinkinConstants.REDORANGE));
-    }
-
-    public CommandBase automation() {
-
-        return this.runOnce(() -> motor.set(BlinkinConstants.AUTOMATION));
-    }
-
-    public CommandBase secondAutomation() {
-
-        return this.runOnce(() -> motor.set(BlinkinConstants.SECOND_AUTOMATION));
+            @Override
+            public void execute() {
+                if (timer.get() % (stateADurationSeconds + stateBDurationSeconds)
+                        < stateADurationSeconds) {
+                    speed = stateA.dutyCycle;
+                } else {
+                    speed = stateB.dutyCycle;
+                }
+            }
+            ;
+        };
     }
 }

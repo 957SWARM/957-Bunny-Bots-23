@@ -9,12 +9,10 @@ import com.team957.lib.telemetry.HighLevelLogger;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.commands.drivetrain.FieldRelativeControlCommand;
-import frc.robot.input.DefaultDriver;
-import frc.robot.input.DriverInput;
-import frc.robot.microsystems.IMU;
-import frc.robot.microsystems.UI;
-import frc.robot.subsystems.DriveSubsystem;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
+import frc.robot.peripherals.IMU;
+import frc.robot.peripherals.Limelight;
+import frc.robot.peripherals.UI;
 
 /**
  * The VM is configured to automatically run this class, and to call the functions corresponding to
@@ -29,8 +27,9 @@ public class Robot extends TimedRobot {
     private UI ui = UI.getInstance();
     double timerControllerUpdate = 0;
 
-    private final DriverInput driver = new DefaultDriver(0);
-    private final DriveSubsystem drive = new DriveSubsystem();
+    Trigger visionTrigger;
+
+    private boolean isFirstAutoEnable = true;
 
     /**
      * This function is run when the robot is first started up and should be used for any
@@ -46,6 +45,11 @@ public class Robot extends TimedRobot {
         HighLevelLogger.getInstance().autoGenerateLogs("highLevel", "base");
 
         BaseHardwareLogger.getInstance().autoGenerateLogs("baseHardware", "base");
+
+        IMU.instance.setAngleToZero();
+
+        // prevent robot freakout on first vision button press??
+        Limelight.getInstance().getTx();
     }
 
     /**
@@ -67,6 +71,8 @@ public class Robot extends TimedRobot {
         HighLevelLogger.getInstance().updateLogs();
         BaseHardwareLogger.getInstance().updateLogs();
 
+        m_robotContainer.updateOdom();
+
         ui.periodic();
         timerControllerUpdate += .02;
         if (timerControllerUpdate >= 1) {
@@ -87,11 +93,10 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-        // m_autonomousCommand = m_robotContainer.getAutonomousCommand();
+        if (isFirstAutoEnable) {
+            CommandScheduler.getInstance().schedule(m_robotContainer.getAutoCommand());
 
-        // schedule the autonomous command (example)
-        if (m_autonomousCommand != null) {
-            m_autonomousCommand.schedule();
+            isFirstAutoEnable = false;
         }
     }
 
@@ -109,17 +114,11 @@ public class Robot extends TimedRobot {
             m_autonomousCommand.cancel();
         }
 
-        IMU.instance.setAngleToZero();
-
         // temporary workaround for commandscheduler requirements issues
-        CommandScheduler.getInstance()
-                .schedule(
-                        new FieldRelativeControlCommand(
-                                drive,
-                                IMU.instance::getCorrectedAngle,
-                                driver::swerveX,
-                                driver::swerveY,
-                                driver::swerveRot));
+
+        // Set limelight to driver mode on startup
+        // LimelightLib.setPipelineIndex("limelight", 0);
+        Limelight.getInstance().setPipe(0);
     }
 
     /** This function is called periodically during operator control. */

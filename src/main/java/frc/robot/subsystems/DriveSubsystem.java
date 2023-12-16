@@ -89,6 +89,9 @@ public class DriveSubsystem implements Subsystem {
 
             this.invertDrive = invertDrive;
 
+            drive.burnFlash();
+            steer.burnFlash();
+
             brakeModeEnabledLogger =
                     new Logger<>(
                             () -> brakeModeEnabled,
@@ -240,7 +243,10 @@ public class DriveSubsystem implements Subsystem {
         }
 
         public double getUnoffsetSteerPositionRadians() {
-            return steer.getAbsoluteEncoder(Type.kDutyCycle).getPosition();
+            return steer.getAbsoluteEncoder(Type.kDutyCycle).getPosition() * 2 * Math.PI;
+
+            // multiply added for compbot. Max sparkmaxes have conversion built-in, comp does not
+            // and it's too much work to explain the problem
         }
 
         public double getSteerPositionRadians() {

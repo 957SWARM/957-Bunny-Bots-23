@@ -2,36 +2,30 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.DoubleSolenoid;
 import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
-import edu.wpi.first.wpilibj.PneumaticsModuleType;
-import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
-import frc.robot.microsystems.UI;
+import frc.robot.peripherals.PneumaticsHub;
+import frc.robot.peripherals.UI;
 
 public class BunnyGrabberSubsystem extends SubsystemBase {
 
-    private final DoubleSolenoid piston;
+    private final DoubleSolenoid piston =
+            PneumaticsHub.instance.getDoubleSolenoid(
+                    Constants.BunnyGrabberConstants.FORWARD_PORT,
+                    Constants.BunnyGrabberConstants.REVERSE_PORT);
 
     public BunnyGrabberSubsystem() {
-        piston =
-                new DoubleSolenoid(
-                        Constants.BunnyGrabberConstants.MODULE_PORT,
-                        PneumaticsModuleType.REVPH,
-                        Constants.BunnyGrabberConstants.FORWARD_PORT,
-                        Constants.BunnyGrabberConstants.REVERSE_PORT);
         piston.set(Value.kReverse);
     }
 
-    public CommandBase extendBunnyGrabber() {
-        return this.runOnce(() -> piston.set(Value.kForward));
+    public Command bunnyGrabberCommand(boolean extend) {
+        return this.runOnce(() -> piston.set(extend ? Value.kForward : Value.kReverse));
     }
 
-    public CommandBase retractBunnyGrabber() {
-        return this.runOnce(() -> piston.set(Value.kReverse));
-    }
-
-    public CommandBase toggleBunnyGrabber() {
-        return this.runOnce(() -> piston.toggle());
+    public Command timedBunnyGrabberCommand(boolean extend, double duration) {
+        return this.startEnd(() -> piston.set(extend ? Value.kForward : Value.kReverse), () -> {})
+                .withTimeout(duration);
     }
 
     public void periodic() {
