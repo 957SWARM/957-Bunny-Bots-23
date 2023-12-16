@@ -3,7 +3,6 @@ package frc.robot;
 import com.team957.lib.controllers.feedback.PID.PIDConstants;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
 import java.util.Map;
 
@@ -69,22 +68,6 @@ public class Constants {
         public static final double kDriveDeadband = 0.05;
         public static final int kDefaultDriverPort = 0;
         public static final int kDefaultOperatorPort = 1;
-    }
-
-    public static final class AutoConstants {
-        public static final double kMaxSpeedMetersPerSecond = 3;
-        public static final double kMaxAccelerationMetersPerSecondSquared = 3;
-        public static final double kMaxAngularSpeedRadiansPerSecond = Math.PI;
-        public static final double kMaxAngularSpeedRadiansPerSecondSquared = Math.PI;
-
-        public static final double kPXController = 1;
-        public static final double kPYController = 1;
-        public static final double kPThetaController = 1;
-
-        // Constraint for the motion profiled robot angle controller
-        public static final TrapezoidProfile.Constraints kThetaControllerConstraints =
-                new TrapezoidProfile.Constraints(
-                        kMaxAngularSpeedRadiansPerSecond, kMaxAngularSpeedRadiansPerSecondSquared);
     }
 
     public static final class NeoMotorConstants {
@@ -204,6 +187,19 @@ public class Constants {
     public static final class PDHConstants {
         public static final int PDH_CAN_ID = 30;
         public static final int PCH_CAN_ID = 31;
+    }
+
+    public static final class PathFollowingConstants {
+        public static final double LINEAR_KP = 1;
+        public static final double LINEAR_KI = 0;
+        public static final double LINEAR_KD = 0;
+
+        public static final double ROTATIONAL_KP = -1;
+        public static final double ROTATIONAL_KI = 0;
+        public static final double ROTATIONAL_KD = 0;
+
+        public static final double LINEAR_TOLERANCE_METERS = 0.1;
+        public static final double ROTATIONAL_TOLERANCE_RADIANS = Units.degreesToRadians(5);
     }
 
     public static final class PneumaticHubConstants {
