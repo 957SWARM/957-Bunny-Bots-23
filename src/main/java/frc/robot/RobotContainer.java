@@ -177,12 +177,11 @@ public class RobotContainer {
                                         drive, odom::getPoseEstimate, oneBunnyPath))
                         .andThen(doNothingCommand.get())
                         .alongWith(
-                                grabber.extendBunnyGrabber()
-                                        .withTimeout(4)
-                                        .andThen(
-                                                grabber.retractBunnyGrabber()
-                                                        .withTimeout(3)
-                                                        .andThen(grabber.extendBunnyGrabber())));
+                                grabber.timedBunnyGrabberCommand(true, 5)
+                                        .andThen(grabber.timedBunnyGrabberCommand(false, 5))
+                                        .andThen(grabber.timedBunnyGrabberCommand(true, 0.5))
+                                        .andThen(grabber.timedBunnyGrabberCommand(false, 0.5))
+                                        .andThen(grabber.timedBunnyGrabberCommand(true, 4)));
 
         Command justMove =
                 Commands.runOnce(
@@ -218,7 +217,9 @@ public class RobotContainer {
                         .onTrue(Commands.runOnce(IMU.instance::setAngleToZero));
 
         grabberTrigger =
-                new Trigger(() -> driver.toggleGrabber()).onTrue(grabber.toggleBunnyGrabber());
+                new Trigger(() -> driver.toggleGrabber())
+                        .toggleOnTrue(grabber.bunnyGrabberCommand(true))
+                        .toggleOnFalse(grabber.bunnyGrabberCommand(false));
 
         cancelTrigger =
                 new Trigger(() -> driver.cancel())
