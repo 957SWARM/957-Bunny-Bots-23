@@ -29,6 +29,8 @@ public class Robot extends TimedRobot {
 
     Trigger visionTrigger;
 
+    private boolean isFirstAutoEnable = true;
+
     /**
      * This function is run when the robot is first started up and should be used for any
      * initialization code.
@@ -91,7 +93,11 @@ public class Robot extends TimedRobot {
      */
     @Override
     public void autonomousInit() {
-        CommandScheduler.getInstance().schedule(m_robotContainer.getAutoCommand());
+        if (isFirstAutoEnable) {
+            CommandScheduler.getInstance().schedule(m_robotContainer.getAutoCommand());
+
+            isFirstAutoEnable = false;
+        }
     }
 
     /** This function is called periodically during autonomous. */
