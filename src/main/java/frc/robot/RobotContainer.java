@@ -5,13 +5,11 @@
 package frc.robot;
 
 import com.team957.lib.util.DeltaTimeUtil;
-import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.util.InterpolatingTreeMap;
 import edu.wpi.first.wpilibj2.command.Command;
-import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.BlinkinConstants;
-import frc.robot.Constants.ShooterConstants;
 import frc.robot.commands.IntakeControlCommand;
 import frc.robot.commands.PIDFshooterControlCommand;
 import frc.robot.commands.TransferControlCommand;
@@ -20,6 +18,7 @@ import frc.robot.input.DefaultOperator;
 import frc.robot.input.DriverInput;
 import frc.robot.input.OperatorInput;
 import frc.robot.peripherals.IMU;
+import frc.robot.peripherals.Limelight;
 import frc.robot.peripherals.UI;
 import frc.robot.subsystems.BlinkinSubsystem;
 import frc.robot.subsystems.BlinkinSubsystem.BlinkinState;
@@ -28,6 +27,7 @@ import frc.robot.subsystems.IntakeSubsystem;
 import frc.robot.subsystems.IntakeSubsystem.IntakeStates;
 import frc.robot.subsystems.ShooterSubsystem;
 import frc.robot.subsystems.TransferSubsystem;
+import java.util.Map.Entry;
 
 public class RobotContainer {
     public static enum RobotState {
@@ -36,6 +36,9 @@ public class RobotContainer {
         INTAKE,
         SHOOT;
     }
+
+    private final InterpolatingTreeMap<Double, Double> distanceToRPMMap =
+            new InterpolatingTreeMap<>();
 
     // Controllers
     DriverInput driver = new DefaultDriver(0);
@@ -66,6 +69,7 @@ public class RobotContainer {
     double shooterCurrentDelay = 0;
     double shooterWaitDelay = 0;
     boolean ballLeft = false;
+    double multiplier = .93;
 
     // Triggers
     // Control Triggers
@@ -95,13 +99,16 @@ public class RobotContainer {
     // Blinkin
     double signalLightDelay = 0;
 
-    private double[] regressionCoefficients;
-
     /*
      * RobotContainer Constructor.
      * Sets up default commands and calls configureBindings()
      */
     public RobotContainer() {
+        for (Entry<Double, Double> entry :
+                Constants.VisionTargetingConstants.DISTANCE_TO_RPM_CONTAINER.entrySet()) {
+            distanceToRPMMap.put(entry.getKey(), entry.getValue());
+        }
+
         // timer object
         dtUtilBreakBeam = new DeltaTimeUtil();
         dtUtilShooterCurrent = new DeltaTimeUtil();
@@ -120,14 +127,6 @@ public class RobotContainer {
         intake.setDefaultCommand(new IntakeControlCommand(intake, () -> intakeState.voltage()));
 
         shooter.setDefaultCommand(new PIDFshooterControlCommand(shooter, () -> targetShooterRPM));
-
-        blinkin.setDefaultCommand(
-                blinkin.setColorCommand(
-                        DriverStation.isFMSAttached()
-                                ? (DriverStation.getAlliance() == DriverStation.Alliance.Red
-                                        ? BlinkinState.RED
-                                        : BlinkinState.BLUE)
-                                : BlinkinState.GOLD));
 
         configureBindings();
     }
@@ -185,9 +184,6 @@ public class RobotContainer {
                                                 BlinkinState.GREEN, BlinkinState.OFF, 0.25, 0.25)
                                         .withTimeout(1));
 
-        CommandScheduler.getInstance()
-                .schedule(blinkin.blinkCommand(BlinkinState.GREEN, BlinkinState.OFF, 0.25, 0.25));
-
         // decreases ball count if shooter current spikes. Debounced to prevent rapid changes
         /*
         currentThresholdTrigger =
@@ -236,7 +232,10 @@ public class RobotContainer {
                 // transfer on, shooter on, intake off
                 enableTransfer = true;
                 intakeState = IntakeStates.IDLE;
-                targetShooterRPM = ShooterConstants.SPEED_RPM;
+                targetShooterRPM =
+                        multiplier
+                                * distanceToRPMMap.get(
+                                        Limelight.getInstance().getDistanceFromTarget());
                 break;
             default:
                 break;
@@ -264,21 +263,4 @@ public class RobotContainer {
         driver = UI.getInstance().getDriverBinding();
         operator = UI.getInstance().getOperatorBinding();
     }
-
-    public double calculateShooterRPM(double distance) {
-        double xSquaredCoeff = regressionCoefficients[0];
-        double xCoeff = regressionCoefficients[1];
-        double coeff = regressionCoefficients[2];
-
-        return (xSquaredCoeff * distance * distance) + (xCoeff * distance) + coeff;
-    }
-
-    /*private void generateRegression() {
-        final PolynomialCurveFitter fitter = PolynomialCurveFitter.create(2);
-        final WeightedObservedPoints obs = new WeightedObservedPoints();
-        for (int i = 0; i < VisionTargetingConstants.LUT_DISTANCE.length; i++) {
-            obs.add(VisionTargetingConstants.LUT_DISTANCE[i], VisionTargetingConstants.LUT_RPM[i]);
-        }
-        regressionCoefficients = fitter.fit(obs.toList());
-    } */
 }

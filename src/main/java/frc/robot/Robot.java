@@ -85,10 +85,7 @@ public class Robot extends TimedRobot {
             m_robotContainer.updateControllers();
             timerControllerUpdate = 0;
         }
-
-        System.out.println(getDistanceFromTarget());
-
-        // System.out.println(IMU.instance.getCorrectedAngle().getRadians());
+        System.out.println("Distance: " + getDistanceFromTarget());
     }
 
     /** This function is called once each time the robot enters Disabled mode. */
@@ -162,10 +159,7 @@ public class Robot extends TimedRobot {
     public void simulationPeriodic() {}
 
     public double calculateRotationVelocity(double target) {
-        // System.out.println(LimelightLib.getTX("limelight"));
         if (driver.visionTargeting()) {
-            // LimelightLib.setPipelineIndex("limelight", 1);
-            Limelight.getInstance().setPipe(1);
             double kp = VisionTargetingConstants.TARGETING_KP;
             double minCommand = VisionTargetingConstants.TARGETING_MIN_COMMAND;
             double tx = target;
@@ -178,8 +172,6 @@ public class Robot extends TimedRobot {
             }
             return 0;
         } else {
-            // LimelightLib.setPipelineIndex("limelight", 0);
-            Limelight.getInstance().setPipe(0);
             return driver.swerveRot();
         }
     }
@@ -193,6 +185,9 @@ public class Robot extends TimedRobot {
         double yShooter = yLimelight;
         double xShooter = xLimelight + xOffset;
         double shooterOffsetAngle = Units.radiansToDegrees(Math.atan2(xShooter, yShooter));
+
+        Limelight.getInstance().setPipe(driver.visionTargeting() ? 1 : 0);
+
         if (tv == true) {
             return calculateRotationVelocity(shooterOffsetAngle);
         }

@@ -5,6 +5,7 @@ import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.util.Units;
+import java.util.Map;
 
 public class Constants {
     public static final class MiscConstants {
@@ -103,7 +104,7 @@ public class Constants {
         public static final boolean ENC_REV = false;
         public static final int CAN_ID = 11;
         public static final double RUNNING_VOLTAGE = 11;
-        public static final int SPEED_RPM = 3300;
+        public static final int SPEED_RPM = 2900;
         public static final double WAIT_DURATION = 0.5;
         public static final int DETECTION_THRESHOLD = 5;
         public static final int CURRENT_LIMIT = 10;
@@ -152,21 +153,13 @@ public class Constants {
         public static final double LIMELIGHT_HEIGHT = 0.546; // METERS
         public static final double LIMELIGHT_ANGLE = 30; // DEGREES
 
-        public static final double SHOOTER_OFFSET = .203; // METERS
+        public static final double SHOOTER_OFFSET = .238; // METERS
         // public static final double SHOOTER_ANGLE = 45; //DEGREES
 
-        public static final double[] LUT_DISTANCE = {
-            1.29, 
-            2.24,
-            0.67,
-            4.18
-        }; // METERS
-        public static final double[] LUT_RPM = {
-            2800,
-            3000,
-            4500,
-            3300
-        }; // RPM
+        public static final Map<Double, Double> DISTANCE_TO_RPM_CONTAINER =
+                Map.of(
+                        1.29, 2850d, 2.24, 3000d, .67, 3200d, 1.02, 3000d, 1.85, 2850d, 1.5, 2850d,
+                        .8, 3200d, 3d, 3000d, 4.1, 3350d);
 
         // this is just kP because:
         // 1: this is for a second-order cascaded controller
