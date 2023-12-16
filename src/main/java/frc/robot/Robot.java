@@ -97,6 +97,8 @@ public class Robot extends TimedRobot {
             CommandScheduler.getInstance().schedule(m_robotContainer.getAutoCommand());
 
             isFirstAutoEnable = false;
+        } else {
+            CommandScheduler.getInstance().schedule(m_robotContainer.doNothingCommand.get());
         }
     }
 

@@ -122,7 +122,7 @@ public class RobotContainer {
 
     private final SendableChooser<Command> autoChooser = new SendableChooser<>();
 
-    private final Supplier<Command> doNothingCommand =
+    public final Supplier<Command> doNothingCommand =
             () -> new ChassisControlCommand(drive, () -> new ChassisSpeeds());
 
     /*
